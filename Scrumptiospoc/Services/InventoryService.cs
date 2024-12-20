@@ -35,6 +35,12 @@ namespace Scrumptiospoc.Services
             inventoryItem.Quantity++;
             OnPropertyChanged(nameof(Inventory));
         }
+
+        public void AddInventoryItem(Location location, Product product)
+        {
+            //product.Id=i
+            //location.Inventory.Items.Add();
+        } 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
         {

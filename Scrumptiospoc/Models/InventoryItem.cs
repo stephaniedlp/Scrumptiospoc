@@ -4,6 +4,7 @@
     {
         public Guid Id { get; set; }
         public Product Product { get; set; }
+        public string NameofProduct { get; set; }
         public int Quantity { get; set; }
         public int MaximumItem { get; set; }
         public int MinimumItem { get; set; }
