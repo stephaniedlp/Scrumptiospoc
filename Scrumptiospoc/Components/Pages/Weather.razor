@@ -1,0 +1,138 @@
+﻿@page "/home"
+@page "/home/{paramId:guid}"
+@using Scrumptiospoc.Interfaces;
+@using Scrumptiospoc.Models;
+@using System.Collections.ObjectModel
+@inject IOrderInterface _orderservice;
+@rendermode InteractiveServer
+
+
+
+<PageTitle>Order</PageTitle>
+
+<h1>Hello, order!</h1>
+
+@if (Orders.Any())
+{
+    @foreach (var item in Orders)
+    {
+        <p>@item.Id</p>
+        <p>@item.Location?.Address</p>
+        <p>@item.Status</p>
+        @foreach(var prod in item.Products){
+            <ol>@prod.Name</ol>
+            <li>@prod.Description</li>
+        }
+       
+
+        <button class="btn btn-primary" @onclick="() => Accept(item)">Accept</button>
+        <button class="btn btn-primary" @onclick="() => Reject(item)">Reject</button>
+        <button class="btn btn-primary" @onclick="() => Ready(item)">Ready</button>
+        <button class="btn btn-primary" @onclick="() => Delivered(item)">Delivered</button>
+        <button class="btn btn-primary" @onclick="() => Cancel(item)">Cancel</button>
+
+    }
+}
+else
+{
+    <p>No orders available.</p>
+}
+
+
+
+@code {
+    [Parameter]
+    public Guid paramId { get; set; }
+
+
+
+    private ObservableCollection<Order> _orders = new();
+    public ObservableCollection<Order> Orders
+    {
+        get => _orders;
+        set
+        {
+            if (_orders != value)
+            {
+
+                _orders = value;
+                StateHasChanged();
+            }
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Call the base method asynchronously
+        await base.OnInitializedAsync();
+        _orderservice.StateChanged += OnStateChanged;
+
+        if (paramId != Guid.Empty)
+        {
+            RefreshOrders(paramId);
+        }
+        else
+        {
+            Orders = new();
+        }
+
+
+
+    }
+
+    private void RefreshOrders(Guid paramId)
+    {
+        Orders.Clear();
+        var filteredOrders = _orderservice.Orders
+           .Where(order => order.Location.Id == paramId);
+
+        foreach (var order in filteredOrders)
+        {
+            Orders.Add(order);
+        }
+
+        StateHasChanged();
+    }
+
+    private void Accept(Order order)
+    {
+
+        _orderservice.AcceptOrder(order);
+    }
+    private void Reject(Order order)
+    {
+        _orderservice.RejectOrder(order);
+    }
+    private void Ready(Order order)
+    {
+        _orderservice.SetReadyOrder(order);
+    }
+    private void Delivered(Order order)
+    {
+        _orderservice.Delivered(order);
+    }
+    private void Cancel(Order order)
+    {
+        _orderservice.CancelOrder(order);
+    }
+
+    private void OnStateChanged()
+    {
+        try
+        {
+
+            InvokeAsync(() =>
+            {
+                RefreshOrders(paramId);  // Update orders based on the new state
+                StateHasChanged();  // Trigger a re-render
+            });
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+    }
+
+}

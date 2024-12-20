@@ -1,0 +1,193 @@
+﻿@page "/admin"
+@rendermode InteractiveServer
+@using Scrumptiospoc.Interfaces;
+@using Scrumptiospoc.Models;
+@using System.ComponentModel
+@using System.Collections.ObjectModel
+@inject IOrderInterface _orderservice;
+@inject ILocationInterface _locationservice;
+@inject IProductInterface _productservice;
+
+<PageTitle>Admin</PageTitle>
+
+<h1>Hello Admin</h1>
+
+
+<button class="btn btn-primary" @onclick="AddLocation" >Add location</button>
+
+<div class="row">
+    <div class="col">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Products</th>
+                </tr>
+                <tr>
+                    <button class="btn btn-primary" @onclick="AddProducts">Add products</button>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Products)
+                {
+                    @if (!product.IsDeleted){
+
+                    <tr>
+                        <td>
+                            <p>@product.Id</p>
+                            <p>@product.Name</p>
+                            <p>@product.DateTime</p>
+                            <p>@product.IsDeleted</p>
+
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => DeleteProduct(product)">Delete</button>
+
+                        </td>
+
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Locations</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var location in Locations)
+                {
+                    <tr>
+                        <td>
+                            <p>@location.Id</p>
+                            <p>@location.Name</p>
+                            <button class="btn btn-primary" @onclick="() => AddOrders(location)">Add orders</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@code {
+    public event PropertyChangedEventHandler PropertyChanged;
+
+
+    private ObservableCollection<Order> _orders;
+    public ObservableCollection<Order> Orders
+    {
+        get => _orders;
+        set
+        {
+            if (_orders != value)
+            {
+
+                _orders = value;
+                OnPropertyChanged(nameof(Orders));
+
+            }
+        }
+    }
+
+    private ObservableCollection<Location> _locations = new();
+    public ObservableCollection<Location> Locations
+    {
+        get => _locations;
+        set
+        {
+            if (_locations != value)
+            {
+
+                _locations = value;
+                OnPropertyChanged(nameof(Locations));
+                OnStateChanged();
+
+            }
+        }
+    }
+
+    private ObservableCollection<Product> _products = new();
+    public ObservableCollection<Product> Products
+    {
+        get => _products;
+        set
+        {
+            if (_products != value)
+            {
+
+                _products = value;
+                OnPropertyChanged(nameof(Products));
+
+            }
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        // Call the base method asynchronously
+        await base.OnInitializedAsync();
+
+        _orderservice.StateChanged += OnStateChanged;
+
+        // Initialize the Location object with appropriate values
+        Location location = new Location
+            {
+                Address = "123 Main St",
+                Longitude = 253.00,
+                Latitude = 25225.555
+            };
+
+        // Get orders based on the location
+        Orders = _orderservice.Orders;
+        Locations = _locationservice.Locations;
+        Products = _productservice.Products;
+    }
+
+
+    public async Task AddLocation()
+    {
+        await _locationservice.CreateLocation();
+        StateHasChanged();
+    }
+
+
+    public async Task AddOrders(Location location)
+    {
+        await _orderservice.CreateOrder(location);
+        StateHasChanged();
+    }
+    public async Task AddProducts(){
+
+        await _productservice.AddProduct();
+        StateHasChanged();
+    }
+    public async Task DeleteProduct(Product product)
+    {
+
+        await _productservice.ArchiveProduct(product);
+        StateHasChanged();
+    }
+
+
+    private void OnStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        _orderservice.StateChanged -= OnStateChanged;
+    }
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+}
