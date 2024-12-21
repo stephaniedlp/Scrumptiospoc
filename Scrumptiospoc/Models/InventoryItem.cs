@@ -1,21 +1,59 @@
-﻿namespace Scrumptiospoc.Models
+﻿using System.Collections.ObjectModel;
+
+namespace Scrumptiospoc.Models
 {
-    public class InventoryItem
+    public class InventoryItem: BaseModel
     {
+
         public Guid Id { get; set; }
-        public Product Product { get; set; }
-        public string NameofProduct { get; set; }
+       
+        public bool IsExtinct { get; set; }
+
+        private Product _product = new();
+        public Product Product
+        {
+            get => _product;
+            set
+            {
+                if (_product != value)
+                {
+
+                    _product = value;
+                    OnPropertyChanged(nameof(Product));
+                }
+            }
+        }
+
+        private Location _location = new();
+        public Location Location
+        {
+            get => _location;
+            set
+            {
+                if (_location != value)
+                {
+
+                    _location = value;
+                    OnPropertyChanged(nameof(Location));
+                }
+            }
+        }
         public int Quantity { get; set; }
         public int MaximumItem { get; set; }
         public int MinimumItem { get; set; }
-        public InventoryItem(Product prod)
+       
+        public InventoryItem(Product product, Location location)
         {
-            Id = Guid.NewGuid();  // Unique ID for the inventory item
-            Product = prod;       // Link the inventory item to the product
-            Quantity = 0;         // Initialize quantity to 0
-            MaximumItem = 100;    // Default maximum quantity
-            MinimumItem = 1;      // Default minimum quantity
+            Id = location.Id;
+            Product = product;
+            Location = location;
+            Quantity = 0;
+            MaximumItem = 9999;
+            MinimumItem = 0;
+            Product = new();
+            Location = new();
         }
+        
 
     }
 }

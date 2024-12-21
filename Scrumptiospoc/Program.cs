@@ -11,6 +11,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddSingleton<IOrderInterface, OrderService>();
 builder.Services.AddSingleton<ILocationInterface, LocationService>();
 builder.Services.AddSingleton<IProductInterface, ProductService>();
+builder.Services.AddSingleton<IInventoryInterface, InventoryService>();
 
 var app = builder.Build();
 

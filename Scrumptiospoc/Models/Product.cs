@@ -8,6 +8,7 @@
         public DateTime DateTime { get; set; }
         public Guid TenantId { get; set; }
         public bool IsDeleted { get; set; }
+        public bool IsSelected { get; set; } = false;
 
     }
 }

@@ -6,6 +6,7 @@
 @using System.Collections.ObjectModel
 @inject IOrderInterface _orderservice;
 @inject ILocationInterface _locationservice;
+@inject IInventoryInterface _inventoryservice;
 @inject IProductInterface _productservice;
 
 <PageTitle>Admin</PageTitle>
@@ -13,8 +14,8 @@
 <h1>Hello Admin</h1>
 
 
-<button class="btn btn-primary" @onclick="AddLocation" >Add location</button>
-<button class="btn btn-primary" @onclick="AddProducts" >Add products</button>
+<button class="btn btn-primary" @onclick="AddProducts">Add products</button>
+<button class="btn btn-primary" @onclick="AddLocation">Add location</button>
 
 
 
@@ -29,22 +30,23 @@
             <tbody>
                 @foreach (var product in Products)
                 {
-                    @if (!product.IsDeleted){
+                    @if (!product.IsDeleted)
+                    {
 
-                    <tr>
-                        <td>
-                            <p>@product.Id</p>
-                            <p>@product.Name</p>
-                            <p>@product.DateTime</p>
-                            <p>@product.IsDeleted</p>
+                        <tr>
+                            <td>
+                                <p>@product.Id</p>
+                                <p>@product.Name</p>
+                                <p>@product.DateTime</p>
+                                <p>@product.IsDeleted</p>
 
-                        </td>
-                        <td>
-                            <button class="btn btn-danger" @onclick="() => DeleteProduct(product)">Delete</button>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger" @onclick="() => DeleteProduct(product)">Delete</button>
 
-                        </td>
+                            </td>
 
-                    </tr>
+                        </tr>
                     }
                 }
             </tbody>
@@ -65,18 +67,92 @@
                             <p>@location.Id</p>
                             <p>@location.Name</p>
                             <button class="btn btn-primary" @onclick="() => AddOrders(location)">Add orders</button>
+
+                        </td>
+                        <td>
+                            <button class="btn btn-success" @onclick="() => OpenProductModal(location)">
+                                Add items from products
+                            </button>
+                        </td>
+                        <td>
+
+
+                            @if (location?.Inventory?.Items != null && location.Inventory.Items.Any())
+                            {
+                                <ol>
+                                    @foreach (var item in location.Inventory.Items)
+                                    {
+
+                                        <li>
+                                            @item.Product?.Name - Quantity: @item.Quantity
+                                            @item.Product?.IsSelected
+                                        </li>
+
+                                    }
+                                </ol>
+                            }
+                            else
+                            {
+                                <p>No items to display.</p>
+                            }
+
+
                         </td>
                     </tr>
+
                 }
             </tbody>
         </table>
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade @((ShowModal ? "show d-block" : "d-none"))" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <button type="button" class="btn-close" aria-label="Close" @onclick="CloseProductModal"></button>
+            </div>
+            <div class="modal-body">
+                <h5 class="modal-title">Select Products</h5>
+                @foreach (var product in Products)
+                {
+                    <div class="form-check" @key="product.Id">
+                        <input class="form-check-input" type="checkbox" checked="@product.IsSelected" value="@_inventoryservice.IsProductInThisLocation(SelectedLocation,product)"
+                        @onchange="(e) => OnProductCheckboxChanged(e, product)" />
+                        <label>@product.Name</label>
+                    </div>
+                }
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="async () => await AssignSelectedProducts(SelectedLocation)">Assign Products</button>
+
+
+            </div>
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     public event PropertyChangedEventHandler PropertyChanged;
 
+    private void OnProductCheckboxChanged(ChangeEventArgs e, Product product)
+    {
+        bool.TryParse(e.Value?.ToString(), out var isChecked);
+
+        if (isChecked)
+        {
+            product.IsSelected = true;
+            SelectedProducts.Add(product);
+
+        }
+
+
+    }
 
     private ObservableCollection<Order> _orders;
     public ObservableCollection<Order> Orders
@@ -110,7 +186,22 @@
             }
         }
     }
+    private Location? SelectedLocation;
+    private List<Product> _selectedproducts = new();
+    public List<Product> SelectedProducts
+    {
+        get => _selectedproducts;
+        set
+        {
+            if (_selectedproducts != value)
+            {
 
+                _selectedproducts = value;
+                OnPropertyChanged(nameof(SelectedProducts));
+
+            }
+        }
+    }
     private ObservableCollection<Product> _products = new();
     public ObservableCollection<Product> Products
     {
@@ -122,17 +213,32 @@
 
                 _products = value;
                 OnPropertyChanged(nameof(Products));
+            }
+        }
+    }
+    private ObservableCollection<InventoryItem> inventoryItems = new();
+    public ObservableCollection<InventoryItem> InventoryItems
+    {
+        get => inventoryItems;
+        set
+        {
+            if (inventoryItems != value)
+            {
+
+                inventoryItems = value;
+                OnPropertyChanged(nameof(InventoryItems));
+                StateHasChanged();
 
             }
         }
     }
+    private bool ShowModal { get; set; } = false;
+
+    // private List<string> SelectedProductIds { get; set; } = new();
     protected override async Task OnInitializedAsync()
     {
-
-
         // Call the base method asynchronously
         await base.OnInitializedAsync();
-
         _orderservice.StateChanged += OnStateChanged;
 
         // Initialize the Location object with appropriate values
@@ -147,8 +253,41 @@
         Orders = _orderservice.Orders;
         Locations = _locationservice.Locations;
         Products = _productservice.Products;
+        InventoryItems = _inventoryservice.InventoryItem;
+        SelectedLocation = new();
+        SelectedProducts = new();
+    }
+   
+    public void OpenProductModal(Location location)
+    {
+       
+        SelectedLocation = location;
+        var productsList = SelectedProducts
+               .Where(product => product.IsSelected)
+               .ToList();
+        // foreach(var prod in productsList ){
+        //     prod.IsSelected = true;
+        // }
+
+        ShowModal = true;
+        StateHasChanged();
     }
 
+    public void CloseProductModal()
+    {
+        ShowModal = false;
+
+        StateHasChanged();
+    }
+
+
+    public async Task AssignSelectedProducts(Location location)
+    {
+
+        await Task.Run(() => _inventoryservice.AddInventoryItem(location, SelectedProducts));
+        StateHasChanged();
+        CloseProductModal();  // Close the modal after assigning
+    }
 
     public async Task AddLocation()
     {
@@ -162,7 +301,8 @@
         await _orderservice.CreateOrder(location);
         StateHasChanged();
     }
-    public async Task AddProducts(){
+    public async Task AddProducts()
+    {
 
         await _productservice.AddProduct();
         StateHasChanged();

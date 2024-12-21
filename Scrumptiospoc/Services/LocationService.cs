@@ -25,7 +25,6 @@ namespace Scrumptiospoc.Services
 
                     _locations = value;
                     OnPropertyChanged(nameof(Locations));
-
                 }
             }
         }
@@ -50,10 +49,12 @@ namespace Scrumptiospoc.Services
                 IsActive = true,
                 IsSlow = false,
                 IsArchived = false,
-                Inventory = new()
+                Inventory = new Inventory() { Items = new List<InventoryItem>() } // Ensure Inventory is initialized
+
             };
 
             Locations.Add(location);
+            
         }
         public async Task ArchiveLocation(Location location)
         {

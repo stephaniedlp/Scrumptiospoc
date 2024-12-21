@@ -1,11 +1,9 @@
-﻿using System.Xml.Linq;
-
-namespace Scrumptiospoc.Models
+﻿namespace Scrumptiospoc.Models
 {
     public class Location :BaseModel
     {
         public Guid Id { get; set; }
-        private string _name;
+        private string _name =string.Empty;
 
         public string Name
         {
@@ -19,7 +17,7 @@ namespace Scrumptiospoc.Models
                 }
             }
         }
-        private string _address;
+        private string _address= string.Empty;
         public string Address {  
         
             get => _address;
@@ -32,16 +30,17 @@ namespace Scrumptiospoc.Models
                 }
             }
         }
-
-
-
-
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public double Latitude { get; set; }= 0;
+        public double Longitude { get; set; }= 0;
         public bool IsActive { get; set; }
         public bool IsSlow { get; set; }
         public bool IsArchived { get; set; }
         public Inventory Inventory { get; set; }
+        public Location( )
+        {
+            Id = Guid.NewGuid();
+        }
+        
 
     }
 }
