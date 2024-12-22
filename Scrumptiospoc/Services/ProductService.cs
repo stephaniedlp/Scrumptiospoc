@@ -25,16 +25,26 @@ namespace Scrumptiospoc.Services
             }
         }
 
+        
+        
+        public ObservableCollection<Product> GetAllProducts()
+        {
+            var prod = Products;
+            return prod;
+        }
+        
+        
+        
         public async  Task AddProduct()
         {
             Product product = new Product
-            {
-                Id = Guid.NewGuid(),
+            {                
                 Name = "Product " + Products.Count().ToString(),
                 Description = "Description for Product",
                 DateTime = DateTime.Now                ,
                 IsDeleted = false
             };
+            //Aqui irá el Add a la database y el await
             Products.Add(product);
         }
        

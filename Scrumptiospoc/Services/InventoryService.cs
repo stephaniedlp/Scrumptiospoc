@@ -1,4 +1,5 @@
-﻿using Scrumptiospoc.Interfaces;
+﻿using Scrumptiospoc.Components.Pages;
+using Scrumptiospoc.Interfaces;
 using Scrumptiospoc.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,70 +8,33 @@ namespace Scrumptiospoc.Services
 {
     public class InventoryService : IInventoryInterface
     {
-        private ObservableCollection<InventoryItem> _inventoryItem = new();
-        public ObservableCollection<InventoryItem> InventoryItem
-        {
-            get => _inventoryItem;
-            set
-            {
-                if (_inventoryItem != value)
-                {
+        public Models.Inventory SelectedInventory { get; set; }
 
-                    _inventoryItem = value;
-                    OnPropertyChanged(nameof(Inventory));
-                }
-            }
-        }
-        public void DecreaseQuantity(InventoryItem inventoryItem)
+        public async Task<bool> IsAdded(Product product)
         {
-            if (inventoryItem.Quantity > 0)
-            {
-                inventoryItem.Quantity--;
-            }
-            OnPropertyChanged(nameof(Inventory));
+            bool isthere =  SelectedInventory.Items.Any(w => w.Product.Id == product.Id);
+            return isthere;
         }
 
-        public void IncreaseQuantity(InventoryItem inventoryItem)
-        {
-            inventoryItem.Quantity++;
-            OnPropertyChanged(nameof(Inventory));
-        }
 
-        public async void AddInventoryItem(Location location, List<Product> products)
+        public async Task<bool> AssignProduct(Product product)
         {
-            // Ensure Items is initialized
-            if (location.Inventory == null)
+            InventoryItem inv = new(SelectedInventory, product);
+
+            if (!await IsAdded(product))
             {
-                location.Inventory = new Inventory(location) { Items = new List<InventoryItem>() };
+                SelectedInventory.Items.Add(inv);
+                return true;
             }
-            // Filter products that are not already in the location's inventory
-            var productsToAdd = products
-                .Where(product => !IsProductInThisLocation(location, product))
-                .ToList();
-
-
-            // Si el producto NO está en el inventario
-            if (productsToAdd.Any())
+            else
             {
-                foreach (var product in productsToAdd)
-                {
-                    var newItem = new InventoryItem(product, location)
-                    {
-                        Quantity = 0 // Start with a quantity of 1
-                    };
-                    
-                    location.Inventory.Items.Add(newItem);
-                }
+                return false;
             }
 
-            OnPropertyChanged(nameof(location.Inventory.Items));
+
         }
 
-        public bool IsProductInThisLocation(Location location, Product product)
-        {            
-            bool productExistinthisLocation = InventoryItem.Any(w => w.Product.Id == product.Id);
-            return productExistinthisLocation;
-        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)

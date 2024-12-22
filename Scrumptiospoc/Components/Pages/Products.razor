@@ -1,0 +1,42 @@
+﻿<h3>Products</h3>
+@page "/products"
+@rendermode InteractiveServer
+@using Scrumptiospoc.Interfaces;
+@using Scrumptiospoc.Models;
+@using System.Collections.ObjectModel
+@inject IProductInterface _productservice;
+
+<h1>Products</h1>
+<button class="btn btn-primary" @onclick="AddProduct">Add products</button>
+@foreach (var item in ProductList)
+{
+    <div> @item.Name </div>
+    <div> @item.Description </div>
+    <div> @item.IsDeleted </div>
+    <button class="btn btn-primary" @onclick="()=>DeleteProduct(item)">Delete</button>
+}
+
+@code {
+
+    public ObservableCollection<Product> ProductList { get; set; }
+
+    public  void AddProduct()
+    {
+         _productservice.AddProduct();
+
+    }
+
+    public async Task DeleteProduct(Product product)
+    {
+        await _productservice.ArchiveProduct(product);
+        StateHasChanged();
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductList = _productservice.GetAllProducts();
+
+    }
+
+}

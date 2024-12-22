@@ -2,6 +2,15 @@
 {
     public class Inventory : BaseModel
     {
+
+        public Inventory(Location location)
+        {
+            Id = Guid.NewGuid();
+            Items = new();            
+            Location = location;
+
+        }
+
         public Guid Id { get; set; }
         private Location _location;
         public Location Location
@@ -18,22 +27,9 @@
             }
         }
         public List<InventoryItem> Items { get; set; }
-        public Inventory(Location location)
-        {
-            Id = Guid.NewGuid();
-            
-            Items = location.Inventory.Items;
-            Location = location;
-
-        }
-        public Inventory ()
-        {
-            Id = Guid.NewGuid();
-        }
-        //public Inventory(Location location)
-        //{
-        //    Location = location;
-        //}
+     
+   
+       
         
     }
 }

@@ -49,8 +49,7 @@ namespace Scrumptiospoc.Services
                 IsActive = true,
                 IsSlow = false,
                 IsArchived = false,
-                Inventory = new Inventory() { Items = new List<InventoryItem>() } // Ensure Inventory is initialized
-
+                
             };
 
             Locations.Add(location);

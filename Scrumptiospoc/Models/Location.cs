@@ -39,6 +39,7 @@
         public Location( )
         {
             Id = Guid.NewGuid();
+            Inventory= new(this);
         }
         
 

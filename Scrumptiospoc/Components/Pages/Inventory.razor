@@ -1,0 +1,133 @@
+﻿@page "/inventory"
+@rendermode InteractiveServer
+@using Scrumptiospoc.Interfaces;
+@using Scrumptiospoc.Models;
+@using System.ComponentModel
+@using System.Collections.ObjectModel
+@inject IOrderInterface _orderservice;
+@inject ILocationInterface _locationservice;
+@inject IInventoryInterface _inventoryservice;
+@inject IProductInterface _productservice;
+
+<PageTitle>Inventory</PageTitle>
+
+<h1>Inventory</h1>
+<h2>@inventory.Location.Name</h2>
+<p>@inventory.Location.Address</p>
+<button type="button" class="btn btn-primary" @onclick="OpenProductModal">Assign Products</button>
+
+
+@if (inventory.Items.Any())
+{
+    foreach (var item in inventory.Items)
+    {
+        <div>@item.Product.Name</div>
+        <div>@item.Quantity</div>
+    }
+}
+
+
+
+<!-- Modal -->
+<div class="modal fade @((ShowModal ? "show d-block" : "d-none"))" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" aria-label="Close" @onclick="CloseProductModal"></button>
+            </div>
+
+            <div class="modal-body">
+                <h5 class="modal-title">Select Products</h5>
+                @foreach (var item in ProductList)
+                {
+                    <div>
+                        <input type="checkbox" @bind="@item.IsSelected" />@item.Name
+                    </div>
+                }
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" @onclick="AssignProducts" class="btn btn-primary">Assign Products</button>
+            </div>
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    public Models.Inventory inventory;
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    public ObservableCollection<Product> ProductList { get; set; }
+
+    private bool ShowModal { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        ProductList = new();
+        inventory = _inventoryservice.SelectedInventory;
+
+        _orderservice.StateChanged += OnStateChanged;
+    }
+
+    public async Task LoadProducts()
+    {
+
+        foreach (var item in _productservice.GetAllProducts())
+        {
+            item.IsSelected = false;
+            if (await _inventoryservice.IsAdded(item))
+            {
+                item.IsSelected = true;
+            }
+            ProductList.Add(item);
+        }
+    }
+
+    public void AssignProducts()
+    {
+
+        foreach (var item in ProductList)
+        {
+            if (item.IsSelected)
+                _inventoryservice.AssignProduct(item);
+        }
+        ShowModal = false;
+    }
+
+
+
+    public async Task OpenProductModal()
+    {
+        await LoadProducts();
+        ShowModal = true;
+        StateHasChanged();
+    }
+    public void CloseProductModal()
+    {
+        ProductList.Clear();
+        ShowModal = false;
+
+    }
+
+
+
+
+    private void OnStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        _orderservice.StateChanged -= OnStateChanged;
+    }
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+}
