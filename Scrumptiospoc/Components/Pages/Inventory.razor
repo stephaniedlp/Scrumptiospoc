@@ -56,7 +56,7 @@
 </div>
 
 @code {
-    public Models.Inventory inventory;
+    private Models.Inventory inventory;
 
     public event PropertyChangedEventHandler PropertyChanged;
     public ObservableCollection<Product> ProductList { get; set; }
@@ -67,14 +67,17 @@
     {
         await base.OnInitializedAsync();
         ProductList = new();
-        inventory = _inventoryservice.SelectedInventory;
+        var location = await _locationservice.GetSelectedLocation();
+        await _inventoryservice.SetSelectedInventory(location.Inventory);
+        inventory = await _inventoryservice.GetSelectedInventory();
 
-        _orderservice.StateChanged += OnStateChanged;
+
+
     }
 
     public async Task LoadProducts()
     {
-
+        ProductList.Clear();
         foreach (var item in _productservice.GetAllProducts())
         {
             item.IsSelected = false;

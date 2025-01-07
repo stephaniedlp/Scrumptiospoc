@@ -8,30 +8,39 @@ namespace Scrumptiospoc.Services
 {
     public class InventoryService : IInventoryInterface
     {
-        public Models.Inventory SelectedInventory { get; set; }
+        public Models.Inventory selectedInventory;
+
+
+        public async Task SetSelectedInventory(Models.Inventory inv)
+        {
+            selectedInventory = inv;
+        }
+
+        public async Task<Models.Inventory> GetSelectedInventory()
+        {
+            return selectedInventory;
+        }
 
         public async Task<bool> IsAdded(Product product)
         {
-            bool isthere =  SelectedInventory.Items.Any(w => w.Product.Id == product.Id);
+            bool isthere = selectedInventory.Items.Any(w => w.Product.Id == product.Id);
             return isthere;
         }
 
 
         public async Task<bool> AssignProduct(Product product)
         {
-            InventoryItem inv = new(SelectedInventory, product);
+            InventoryItem inv = new(selectedInventory, product);
 
             if (!await IsAdded(product))
             {
-                SelectedInventory.Items.Add(inv);
+                selectedInventory.Items.Add(inv);
                 return true;
             }
             else
             {
                 return false;
             }
-
-
         }
 
 
@@ -41,5 +50,7 @@ namespace Scrumptiospoc.Services
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+
     }
 }

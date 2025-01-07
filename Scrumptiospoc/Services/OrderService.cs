@@ -42,18 +42,17 @@ namespace Scrumptiospoc.Services
 
 
 
-        public async Task<List<Order>> GetOrderLocation(Location location)
+        public async Task<ObservableCollection<Order>> GetOrderLocation(Location location)
         {
-            // Assuming Location class has an overridden Equals method for proper comparison
+            
+            ObservableCollection<Order> orders = new ObservableCollection<Order>(Orders.Where(w => w.Location.Id.Equals(location.Id)));
 
-
-            return Orders.Where(w => w.Location.Address.Equals(location.Address)).ToList();
+            return orders;
         }
 
         public async Task<List<Order>> GetOrders()
         {
-            // Assuming Location class has an overridden Equals method for proper comparison
-
+          
 
             return Orders.ToList();
         }
@@ -61,9 +60,8 @@ namespace Scrumptiospoc.Services
 
         public async Task AcceptOrder(Order order)
         {
-            Order selectedOrder = Orders.Where(w => w.Id == order.Id).SingleOrDefault();
-            selectedOrder.AcceptedDate = DateTime.Now;
-            selectedOrder.Status=Status.Accepted;       
+
+            order.Status=Status.Accepted;       
             OnPropertyChanged(nameof(Orders));
             NotifyStateChanged();
         }
@@ -109,16 +107,7 @@ namespace Scrumptiospoc.Services
                 Id = Guid.NewGuid(),
                 DriverId = "Driver1",
                 AssignedOrderId = 101,
-                Products = new ObservableCollection<Product>
-                {
-                    new Product { Name = "Burrito", Description = "No salsa, no avocado" },
-                    new Product { Name = "Falafel", Description = "Warm wrap" ,DateTime=DateTime.UtcNow}
-                },
-                Messages = new ObservableCollection<Message>
-                {
-                    new Message { Description = "Order confirmed", DateTime = DateTime.Now.AddMinutes(-30) },
-                    new Message { Description = "On the way", DateTime = DateTime.Now.AddMinutes(-15) }
-                },
+                OrderItems = new ObservableCollection<InventoryItem>(),                
                 CreationDate = DateTime.Now,
                 AcceptedDate = DateTime.Now,
                 FinishedDate = DateTime.Now,
@@ -126,7 +115,7 @@ namespace Scrumptiospoc.Services
                 DeliveredDate = DateTime.Now,
                 Location = location,
                 Status = Status.Created
-            };
+            }; 
           
             Orders.Add(order1);
 

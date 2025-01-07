@@ -19,9 +19,10 @@
         <p>@item.Id</p>
         <p>@item.Location?.Address</p>
         <p>@item.Status</p>
-        @foreach(var prod in item.Products){
-            <ol>@prod.Name</ol>
-            <li>@prod.Description</li>
+        @foreach (var prod in item.OrderItems)
+        {
+            <ol>@prod.Product.Name</ol>
+            <li>@prod.Product.Description</li>
         }
        
 

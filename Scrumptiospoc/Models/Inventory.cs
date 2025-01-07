@@ -26,7 +26,7 @@
                 }
             }
         }
-        public List<InventoryItem> Items { get; set; }
+        public List<InventoryItem> Items { get; set; } = new();
      
    
        

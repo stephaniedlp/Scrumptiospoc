@@ -36,7 +36,9 @@
         public bool IsSlow { get; set; }
         public bool IsArchived { get; set; }
         public Inventory Inventory { get; set; }
-        public Location( )
+        public List<Order> Orders { get; set; } = new();
+
+        public Location()
         {
             Id = Guid.NewGuid();
             Inventory= new(this);

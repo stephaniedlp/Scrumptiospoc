@@ -26,7 +26,8 @@
     <p>@location.Name</p>
     <p>@location.Address</p>
     <p>
-        <button class="btn btn-primary" @onclick="()=>NavigateInvetory(location.Inventory)">Inventory</button>
+        <button class="btn btn-primary" @onclick="()=>NavigateToInventory(location)">Inventory</button>
+        <button class="btn btn-primary" @onclick="()=>NavigateToOrders(location)">Orders</button>
     </p>
     
 
@@ -52,23 +53,18 @@
         }
     }
 
-    // private List<string> SelectedProductIds { get; set; } = new();
+   
     protected override async Task OnInitializedAsync()
     {
-        // Call the base method asynchronously
+        
         await base.OnInitializedAsync();
-        _orderservice.StateChanged += OnStateChanged;
-
-        // Initialize the Location object with appropriate values
+        _orderservice.StateChanged += OnStateChanged;        
         Location location = new Location
             {
                 Address = "123 Main St",
                 Longitude = 253.00,
                 Latitude = 25225.555
-            };
-
-        // Get orders based on the location
-
+            };   
         LocationList = _locationservice.Locations;
 
 
@@ -95,10 +91,18 @@
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    private void NavigateInvetory(Models.Inventory inv)
+    private void NavigateToOrders(Location loc)
     {
-        _inventoryservice.SelectedInventory = inv;
+        _locationservice.SelectLocation(loc);
+        NavigationManager.NavigateTo("/Orders");
+    }
+
+    private void NavigateToInventory(Location loc)
+    {
+        _locationservice.SelectLocation(loc);
         NavigationManager.NavigateTo("/Inventory");
     }
+
+ 
 
 }

@@ -7,8 +7,8 @@ namespace Scrumptiospoc.Models
         public Guid Id { get; set; }
         public string DriverId { get; set; }
         public int AssignedOrderId { get; set; }
-        public ObservableCollection<Product> Products { get; set; }
-        public ObservableCollection<Message> Messages { get; set; }   
+        public ObservableCollection<InventoryItem> OrderItems { get; set; } = new();
+        public ObservableCollection<Message> Messages { get; set; } = new(); 
         public DateTime CreationDate { get; set; }
         public DateTime AcceptedDate { get; set; }
         public DateTime RejectedDate { get; set; }

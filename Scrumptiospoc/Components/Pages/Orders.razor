@@ -1,0 +1,65 @@
+﻿
+@page "/orders"
+@rendermode InteractiveServer
+@using Scrumptiospoc.Interfaces;
+@using Scrumptiospoc.Models;
+@using System.ComponentModel
+@using System.Collections.ObjectModel
+@inject IOrderInterface _orderservice;
+@inject ILocationInterface _locationservice;
+@inject IInventoryInterface _inventoryservice;
+@inject IProductInterface _productservice;
+
+<PageTitle>Orders</PageTitle>
+
+<h2>@location.Name</h2>
+<p>@location.Address</p>
+
+<button type="button" @onclick="AddOrder" class="btn btn-primary">Add Order</button>
+
+<div>
+    @foreach(var item in orders)
+    {
+        <div> @item.Id </div>
+        <div> @item.Status </div>
+        <div> @item.CreationDate</div>
+        <div> @item.AcceptedDate</div>
+        <div> @item.CacelationDate</div>
+        <div> @item.FinishedDate</div>
+        <div> @item.DeliveredDate</div>
+        
+
+
+
+        @foreach (var product in item.OrderItems)
+        {
+            <div>@product.Product.Name</div>
+        }
+    }
+</div>
+
+
+
+@code {
+    private Location location;
+    private ObservableCollection<Order> orders=new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        UpdateOrders();
+    }
+
+    public void AddOrder()
+    {
+        _orderservice.CreateOrder(location);
+        UpdateOrders();
+
+    }
+
+    public async void UpdateOrders()
+    {
+        location = await _locationservice.GetSelectedLocation();
+        orders = await _orderservice.GetOrderLocation(location);
+    }
+
+}

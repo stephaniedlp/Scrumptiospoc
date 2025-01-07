@@ -9,11 +9,12 @@ namespace Scrumptiospoc.Services
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        
         public LocationService()
         {
             Locations = new();
         }
-
+        public Location SelectedLocation { get; set; }
         private ObservableCollection<Location> _locations;
         public ObservableCollection<Location> Locations
         {
@@ -28,6 +29,22 @@ namespace Scrumptiospoc.Services
                 }
             }
         }
+
+        public async Task SelectLocation(Location loc)
+        {
+            SelectedLocation=loc;
+        }
+
+        public async Task<Location> GetSelectedLocation()
+        {
+            return SelectedLocation;
+        }
+
+        public async Task ClearSelectedLocation()
+        {
+            SelectedLocation = new();
+        }
+               
 
         public async Task OnOffLocation(Location location)
         {

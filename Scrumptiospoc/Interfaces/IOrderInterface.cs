@@ -8,7 +8,7 @@ namespace Scrumptiospoc.Interfaces
     public interface IOrderInterface: INotifyPropertyChanged
     {
         event Action StateChanged;
-        Task<List<Order>> GetOrderLocation(Location location);
+        Task<ObservableCollection<Order>> GetOrderLocation(Location location);
         Task<List<Order>> GetOrders();
         Task AcceptOrder(Order order);
         Task RejectOrder(Order order);
