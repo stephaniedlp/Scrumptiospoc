@@ -61,40 +61,41 @@ namespace Scrumptiospoc.Services
         public async Task AcceptOrder(Order order)
         {
 
-            order.Status=Status.Accepted;       
+            order.Status=Status.Accepted; 
+            order.AcceptedDate=DateTime.Now;
             OnPropertyChanged(nameof(Orders));
             NotifyStateChanged();
         }
         public async Task RejectOrder(Order order)
         {
-            Order selectedOrder = Orders.Where(w => w.Id == order.Id).SingleOrDefault();
-            selectedOrder.RejectedDate = DateTime.Now;
-            selectedOrder.Status=Status.Rejected;
+            
+            order.RejectedDate = DateTime.Now;
+            order.Status=Status.Rejected;
             OnPropertyChanged(nameof(Orders));
             NotifyStateChanged();
         }
         public async Task SetReadyOrder(Order order)
         {
-            Order selectedOrder = Orders.Where(w => w.Id == order.Id).SingleOrDefault();
-            selectedOrder.FinishedDate = DateTime.Now;
-            selectedOrder.Status = Status.Finished;
+            
+            order.FinishedDate = DateTime.Now;
+            order.Status = Status.Finished;
             OnPropertyChanged(nameof(Orders));
             NotifyStateChanged();
 
         }
         public async Task Delivered(Order order)
         {
-            Order selectedOrder = Orders.Where(w => w.Id == order.Id).SingleOrDefault();
-            selectedOrder.DeliveredDate = DateTime.Now;
-            selectedOrder.Status=Status.Delivered;
+           
+            order.DeliveredDate = DateTime.Now;
+            order.Status=Status.Delivered;
             OnPropertyChanged(nameof(Orders));
             NotifyStateChanged();
         }
         public async Task CancelOrder(Order order)
         {
-            Order selectedOrder = Orders.Where(w => w.Id == order.Id).SingleOrDefault();
-            selectedOrder.CacelationDate = DateTime.Now;
-            selectedOrder.Status=Status.Canceled;
+            
+            order.CacelationDate = DateTime.Now;
+            order.Status=Status.Canceled;
             OnPropertyChanged(nameof(Orders));
             NotifyStateChanged();
         }
