@@ -1,5 +1,6 @@
-﻿
-@page "/orders"
+﻿@page "/orders"
+@layout ModalLayout
+@using Scrumptiospoc.Components.Layout
 @rendermode InteractiveServer
 @using Scrumptiospoc.Interfaces;
 @using Scrumptiospoc.Models;
@@ -11,49 +12,111 @@
 @inject IProductInterface _productservice;
 
 <PageTitle>Orders</PageTitle>
-
-<h2>@location.Name</h2>
-<p>@location.Address</p>
-
-<button type="button" @onclick="AddOrder" class="btn btn-primary">Add Order</button>
-
-<div>
-    @foreach(var item in orders)
-    {
-        <div> @item.Id </div>
-        <div> @item.Status </div>
-        <div> @item.CreationDate</div>
-        <div> @item.AcceptedDate</div>
-        <div> @item.CacelationDate</div>
-        <div> @item.FinishedDate</div>
-        <div> @item.DeliveredDate</div>
-        
-
-
-
-        @foreach (var product in item.OrderItems)
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2>@location.Name</h2>
+            <p>@location.Address</p>
+            <button type="button" @onclick="AddOrder" class="btn btn-primary">Add Order</button>
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h2>
+                Orders
+            </h2>
+        </div>
+        @foreach (var item in orders)
         {
-            <div>@product.Product.Name</div>
+            <div class="col-6">
+                <div class="col-12">
+                    <div> @item.Id </div>
+                    <div> @item.Status </div>
+                    <div> @item.CreationDate</div>
+                    <div> @item.AcceptedDate</div>
+                    <div> @item.CacelationDate</div>
+                    <div> @item.FinishedDate</div>
+                    <div> @item.DeliveryDate</div>
+                </div>
+                <div class="col-12">
+                    @foreach (var assigned in item.Location.Inventory.Items)
+                    {
+                        <div class="row">
+                            <div class="col-4">
+                                <p>@assigned.Product.Name</p>
+                            </div>
+                            <div class="col-4">
+                                <p>@assigned.Quantity</p>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" @onclick="()=>AddToOrder(assigned, item)" class="btn btn-primary">Add to Order</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="col-12">
+                    @if (item.OrderItems.Count() > 0)
+                    {
+                        <h3>Products in my Order</h3>
+
+                        @foreach (var product in item.OrderItems)
+                        {
+                            <div class="row">
+                                <div class="col-4">
+                                    <div>@product.Product.Name</div>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" @onclick="()=>RemoveFromOder(product, item)" class="btn btn-primary">Remove</button>
+                                </div>
+                                <div class="col-4">
+                                </div>
+                            </div>
+                        }
+
+                        <button type="button" @onclick="()=>SetOrder(item)" class="btn btn-primary">Set Order</button>
+                    }
+                </div>
+
+            </div>
         }
-    }
+
+
+
+    </div>
 </div>
-
-
 
 @code {
     private Location location;
-    private ObservableCollection<Order> orders=new();
+    private ObservableCollection<Order> orders = new();
 
     protected override async Task OnInitializedAsync()
     {
         UpdateOrders();
     }
 
-    public void AddOrder()
+    public async void AddOrder()
     {
-        _orderservice.CreateOrder(location);
+        await _orderservice.CreateOrder(location);
         UpdateOrders();
 
+    }
+
+
+    public async void SetOrder(Order order)
+    {
+        await _orderservice.SetOrder(order);
+    }
+
+
+    public async void RemoveFromOder(InventoryItem item, Order order)
+    {
+        await _orderservice.RemoveProductFromOrder(item, order);
+    }
+
+    public async void AddToOrder(InventoryItem item, Order order)
+    {
+        await _orderservice.AddProductToOrder(item, order);
     }
 
     public async void UpdateOrders()

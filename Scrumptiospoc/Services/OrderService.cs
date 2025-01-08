@@ -12,14 +12,12 @@ namespace Scrumptiospoc.Services
         public event PropertyChangedEventHandler PropertyChanged;
 
 
-
+        
         public OrderService()
         {
           
             
-        }
-
-  
+        }  
 
         public event Action? StateChanged;
 
@@ -27,86 +25,69 @@ namespace Scrumptiospoc.Services
         {
             StateChanged?.Invoke();
         }
-
-
-
-
         public async Task<ObservableCollection<Order>> GetOrderLocation(Location location)
         {
             ObservableCollection<Order> orders = location.Orders;
-
             return orders;
         }
 
-        
 
+        public async Task AddProductToOrder(InventoryItem prod, Order order)
+        {
+            order.OrderItems.Add(prod);
+            NotifyStateChanged();
+        }
+
+        public async Task RemoveProductFromOrder(InventoryItem item, Order order)
+        {
+            order.OrderItems.Remove(item);
+            NotifyStateChanged();
+        }
+
+        public async Task SetOrder(Order order)
+        {
+            order.Status = Status.IsSet;
+            order.CreationDate=DateTime.Now;
+            NotifyStateChanged();
+        }
 
         public async Task AcceptOrder(Order order)
         {
-
             order.Status=Status.Accepted; 
-            order.AcceptedDate=DateTime.Now;
-            
+            order.AcceptedDate=DateTime.Now;            
             NotifyStateChanged();
         }
         public async Task RejectOrder(Order order)
-        {
-            
+        {            
             order.RejectedDate = DateTime.Now;
-            order.Status=Status.Rejected;
-            
+            order.Status=Status.Rejected;            
             NotifyStateChanged();
         }
         public async Task SetReadyOrder(Order order)
-        {
-            
+        {            
             order.FinishedDate = DateTime.Now;
-            order.Status = Status.Finished;
-            
+            order.Status = Status.Finished;            
             NotifyStateChanged();
-
         }
         public async Task Delivered(Order order)
-        {
-           
-            order.DeliveredDate = DateTime.Now;
-            order.Status=Status.Delivered;
-            
+        {           
+            order.DeliveryDate = DateTime.Now;
+            order.Status=Status.Delivered;            
             NotifyStateChanged();
         }
         public async Task CancelOrder(Order order)
-        {
-            
+        {            
             order.CacelationDate = DateTime.Now;
-            order.Status=Status.Canceled;
-            
+            order.Status=Status.Canceled;            
             NotifyStateChanged();
         }
 
 
-        public Task CreateOrder(Location location)
+        public async Task CreateOrder(Location location)
         {
-            Order order1 = new Order
-            {
-                Id = Guid.NewGuid(),
-                DriverId = "Driver1",
-                AssignedOrderId = 101,
-                OrderItems = new ObservableCollection<InventoryItem>(),                
-                CreationDate = DateTime.Now,
-                AcceptedDate = DateTime.Now,
-                FinishedDate = DateTime.Now,
-                RejectedDate = DateTime.Now,
-                DeliveredDate = DateTime.Now,
-                Location = location,
-                Status = Status.Created
-            };
-
-            location.Orders.Add(order1);
-
-
-            
-            NotifyStateChanged();
-            return Task.CompletedTask;
+            Order order = new Order(location);
+            location.Orders.Add(order);               
+            NotifyStateChanged();            
         }
 
 

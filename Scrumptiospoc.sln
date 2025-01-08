@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scrumptiospoc", "Scrumptiospoc\Scrumptiospoc.csproj", "{BB68D16E-5EEE-459F-AB82-4E7F60E25F46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPoC.Tests", "SPoC.Tests\SPoC.Tests.csproj", "{375F68A0-F5AF-4487-A2B3-BF08F67D9945}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SPoC.Tests", "SPoC.Tests\SPoC.Tests.csproj", "{375F68A0-F5AF-4487-A2B3-BF08F67D9945}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

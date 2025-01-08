@@ -22,7 +22,7 @@
 
 @foreach (var location in LocationList)
 {
-    <p>@location.Id</p>
+    <p> <a href="/home/@location.Id"> @location.Id</a> </p>
     <p>@location.Name</p>
     <p>@location.Address</p>
     <p>

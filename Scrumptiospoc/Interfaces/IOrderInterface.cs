@@ -12,15 +12,13 @@ namespace Scrumptiospoc.Interfaces
    
         Task AcceptOrder(Order order);
         Task RejectOrder(Order order);
+        Task SetOrder(Order order);
         Task SetReadyOrder(Order order);
         Task Delivered(Order order);
         Task CancelOrder(Order order);
         Task CreateOrder(Location location);
+        Task AddProductToOrder(InventoryItem prod, Order order);
+        Task RemoveProductFromOrder(InventoryItem prod, Order order); 
 
-        
-        
-       
-
-     
     }
 }

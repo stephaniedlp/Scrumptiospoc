@@ -1,4 +1,6 @@
 ﻿@page "/inventory"
+@layout ModalLayout
+@using Scrumptiospoc.Components.Layout
 @rendermode InteractiveServer
 @using Scrumptiospoc.Interfaces;
 @using Scrumptiospoc.Models;
@@ -22,7 +24,10 @@
     foreach (var item in inventory.Items)
     {
         <div>@item.Product.Name</div>
-        <div>@item.Quantity</div>
+        <div>
+            <input type="text" @bind-value="@item.Quantity" @bind-value:event="onchange" />
+            
+        </div>
     }
 }
 
