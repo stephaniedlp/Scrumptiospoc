@@ -1,4 +1,6 @@
-﻿namespace Scrumptiospoc.Models
+﻿using System.Collections.ObjectModel;
+
+namespace Scrumptiospoc.Models
 {
     public class Location :BaseModel
     {
@@ -36,7 +38,7 @@
         public bool IsSlow { get; set; }
         public bool IsArchived { get; set; }
         public Inventory Inventory { get; set; }
-        public List<Order> Orders { get; set; } = new();
+        public ObservableCollection<Order> Orders { get; set; } = new();
 
         public Location()
         {

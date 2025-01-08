@@ -11,26 +11,15 @@ namespace Scrumptiospoc.Services
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+
+
         public OrderService()
         {
-            Orders = new();
+          
             
         }
 
-        private ObservableCollection<Order> _orders;
-        public ObservableCollection<Order> Orders
-        {
-            get => _orders;
-            set
-            {
-                if (_orders != value) {
-
-                    _orders = value;
-                    OnPropertyChanged(nameof(Orders));
-                    NotifyStateChanged();
-                }
-            }
-        }
+  
 
         public event Action? StateChanged;
 
@@ -44,18 +33,12 @@ namespace Scrumptiospoc.Services
 
         public async Task<ObservableCollection<Order>> GetOrderLocation(Location location)
         {
-            
-            ObservableCollection<Order> orders = new ObservableCollection<Order>(Orders.Where(w => w.Location.Id.Equals(location.Id)));
+            ObservableCollection<Order> orders = location.Orders;
 
             return orders;
         }
 
-        public async Task<List<Order>> GetOrders()
-        {
-          
-
-            return Orders.ToList();
-        }
+        
 
 
         public async Task AcceptOrder(Order order)
@@ -63,7 +46,7 @@ namespace Scrumptiospoc.Services
 
             order.Status=Status.Accepted; 
             order.AcceptedDate=DateTime.Now;
-            OnPropertyChanged(nameof(Orders));
+            
             NotifyStateChanged();
         }
         public async Task RejectOrder(Order order)
@@ -71,7 +54,7 @@ namespace Scrumptiospoc.Services
             
             order.RejectedDate = DateTime.Now;
             order.Status=Status.Rejected;
-            OnPropertyChanged(nameof(Orders));
+            
             NotifyStateChanged();
         }
         public async Task SetReadyOrder(Order order)
@@ -79,7 +62,7 @@ namespace Scrumptiospoc.Services
             
             order.FinishedDate = DateTime.Now;
             order.Status = Status.Finished;
-            OnPropertyChanged(nameof(Orders));
+            
             NotifyStateChanged();
 
         }
@@ -88,7 +71,7 @@ namespace Scrumptiospoc.Services
            
             order.DeliveredDate = DateTime.Now;
             order.Status=Status.Delivered;
-            OnPropertyChanged(nameof(Orders));
+            
             NotifyStateChanged();
         }
         public async Task CancelOrder(Order order)
@@ -96,7 +79,7 @@ namespace Scrumptiospoc.Services
             
             order.CacelationDate = DateTime.Now;
             order.Status=Status.Canceled;
-            OnPropertyChanged(nameof(Orders));
+            
             NotifyStateChanged();
         }
 
@@ -116,12 +99,12 @@ namespace Scrumptiospoc.Services
                 DeliveredDate = DateTime.Now,
                 Location = location,
                 Status = Status.Created
-            }; 
-          
-            Orders.Add(order1);
+            };
+
+            location.Orders.Add(order1);
 
 
-            OnPropertyChanged(nameof(Orders));
+            
             NotifyStateChanged();
             return Task.CompletedTask;
         }

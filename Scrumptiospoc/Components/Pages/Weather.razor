@@ -4,6 +4,7 @@
 @using Scrumptiospoc.Models;
 @using System.Collections.ObjectModel
 @inject IOrderInterface _orderservice;
+@inject ILocationInterface _locationservice;
 @rendermode InteractiveServer
 
 
@@ -82,11 +83,12 @@ else
 
     }
 
-    private void RefreshOrders(Guid paramId)
+    private async void RefreshOrders(Guid paramId)
     {
         Orders.Clear();
-        var filteredOrders = _orderservice.Orders
-           .Where(order => order.Location.Id == paramId);
+        Location location = _locationservice.Locations.Where(w => w.Id == paramId).SingleOrDefault();
+
+        var filteredOrders = location.Orders;
 
         foreach (var order in filteredOrders)
         {

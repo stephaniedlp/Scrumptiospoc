@@ -9,7 +9,7 @@ namespace Scrumptiospoc.Interfaces
     {
         event Action StateChanged;
         Task<ObservableCollection<Order>> GetOrderLocation(Location location);
-        Task<List<Order>> GetOrders();
+   
         Task AcceptOrder(Order order);
         Task RejectOrder(Order order);
         Task SetReadyOrder(Order order);
@@ -19,10 +19,7 @@ namespace Scrumptiospoc.Interfaces
 
         
         
-        public ObservableCollection<Order> Orders
-        {
-            get; set;
-        }
+       
 
      
     }
