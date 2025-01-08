@@ -34,9 +34,14 @@ namespace Scrumptiospoc.Models
         }
         public double Latitude { get; set; }= 0;
         public double Longitude { get; set; }= 0;
-        public bool IsActive { get; set; }
-        public bool IsSlow { get; set; }
         public bool IsArchived { get; set; }
+
+        public bool IsSlow { get; set; }
+        public bool IsActive { get; set; }
+        public double Downtime { get; set; }
+        public DateTime LastOffline { get; set; }
+
+
         public Inventory Inventory { get; set; }
         public ObservableCollection<Order> Orders { get; set; } = new();
 
