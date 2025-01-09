@@ -14,6 +14,11 @@
 <PageTitle>Order</PageTitle>
 
 <h1>Orders</h1>
+<button class="@((Location.IsActive ? "btn btn-primary" : "btn btn-danger"))" @onclick="OnlineBtn">@ButtonText</button>
+<button class="@((Location.IsSlow ? "btn btn-warning" : "btn btn-primary"))" @onclick="SlowStatusBtn">Rush Hour: @Location.IsSlow</button>
+<br />
+<p>Total downtime is @Location.Downtime seconds </p>
+<p>@Location.LastOffline</p>
 <hr />
 
 @if (Orders.Any())
@@ -63,7 +68,7 @@ else
     [Parameter]
     public Guid paramId { get; set; }
 
-
+    private string ButtonText = "Online";
 
     private ObservableCollection<Order> _orders = new();
     public ObservableCollection<Order> Orders
@@ -80,7 +85,20 @@ else
         }
     }
 
+    private Location _location = new();
+    public Location Location
+    {
+        get => _location;
+        set
+        {
+            if (_location != value)
+            {
 
+                _location = value;
+                StateHasChanged();
+            }
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
         // Call the base method asynchronously
@@ -103,9 +121,9 @@ else
     private async void RefreshOrders(Guid paramId)
     {
         Orders.Clear();
-        Location location = _locationservice.Locations.Where(w => w.Id == paramId).SingleOrDefault();
+        Location = _locationservice.Locations.Where(w => w.Id == paramId).SingleOrDefault();
 
-        var filteredOrders = location.Orders;
+        var filteredOrders = Location.Orders;
 
         foreach (var order in filteredOrders)
         {
@@ -114,29 +132,50 @@ else
 
         StateHasChanged();
     }
-
     private void Accept(Order order)
     {
-
         _orderservice.AcceptOrder(order);
+        NotifyStateChanged();
+        OnStateChanged();
     }
     private void Reject(Order order)
     {
         _orderservice.RejectOrder(order);
+        StateHasChanged();
     }
     private void Ready(Order order)
     {
         _orderservice.SetReadyOrder(order);
+        StateHasChanged();
     }
     private void Delivered(Order order)
     {
         _orderservice.Delivered(order);
+        StateHasChanged();
     }
     private void Cancel(Order order)
     {
         _orderservice.CancelOrder(order);
+        StateHasChanged();
+    }
+    private void OnlineBtn()
+    {
+        Location = _locationservice.Locations.Where(w => w.Id == paramId).SingleOrDefault();
+        _locationservice.OnOffLocation(Location);
+        ButtonText = ButtonText == "Online" ? "Offline" : "Online";   
+        StateHasChanged();
+    }
+    private void SlowStatusBtn() 
+    {
+        _locationservice.IsSlow(Location);
+        StateHasChanged();
     }
 
+    private void NotifyStateChanged()
+    {
+        StateChanged?.Invoke();
+    }
+    public event Action? StateChanged;
     private void OnStateChanged()
     {
         try

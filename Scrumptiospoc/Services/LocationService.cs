@@ -9,7 +9,8 @@ namespace Scrumptiospoc.Services
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        
+
+        public event Action? StateChanged;
         public LocationService()
         {
             Locations = new();
@@ -44,13 +45,30 @@ namespace Scrumptiospoc.Services
         {
             SelectedLocation = new();
         }
-               
 
-        public async Task OnOffLocation(Location location)
+        
+        private void NotifyStateChanged()
         {
+            StateChanged?.Invoke();
+        }
 
-            Location SelectedLocation = Locations.Where(x => x.Id == location.Id).SingleOrDefault();
-            SelectedLocation.IsActive = !location.IsActive;
+        public void OnOffLocation(Location location)
+        {
+            location.IsActive = !location.IsActive;
+            if (location.IsActive)
+            {
+                location.LastOnline = DateTime.Now;
+            }
+            else
+            {
+                location.LastOffline = DateTime.Now;
+            }
+            location.Downtime =location.CalculateDownTime();
+            NotifyStateChanged();
+        }
+
+        public void IsSlow(Location location) {
+            location.IsSlow = !location.IsSlow;
         }
 
         public async Task CreateLocation()
@@ -77,7 +95,7 @@ namespace Scrumptiospoc.Services
             Location SelectedLocation = Locations.Where(w => w.Id == location.Id).SingleOrDefault();
             SelectedLocation.IsArchived = !location.IsArchived;
         }
-
+      
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

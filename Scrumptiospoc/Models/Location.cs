@@ -2,10 +2,10 @@
 
 namespace Scrumptiospoc.Models
 {
-    public class Location :BaseModel
+    public class Location : BaseModel
     {
         public Guid Id { get; set; }
-        private string _name =string.Empty;
+        private string _name = string.Empty;
 
         public string Name
         {
@@ -19,9 +19,10 @@ namespace Scrumptiospoc.Models
                 }
             }
         }
-        private string _address= string.Empty;
-        public string Address {  
-        
+        private string _address = string.Empty;
+        public string Address
+        {
+
             get => _address;
             set
             {
@@ -32,25 +33,36 @@ namespace Scrumptiospoc.Models
                 }
             }
         }
-        public double Latitude { get; set; }= 0;
-        public double Longitude { get; set; }= 0;
+        public double Latitude { get; set; } = 0;
+        public double Longitude { get; set; } = 0;
         public bool IsArchived { get; set; }
 
         public bool IsSlow { get; set; }
         public bool IsActive { get; set; }
-        public double Downtime { get; set; }
+        public double Downtime { get;  set; } 
         public DateTime LastOffline { get; set; }
-
+        public DateTime LastOnline { get; set; }
 
         public Inventory Inventory { get; set; }
         public ObservableCollection<Order> Orders { get; set; } = new();
 
+        public double CalculateDownTime()
+        {
+            var calc = (LastOnline - LastOffline).Seconds;
+            if (calc >= 0)
+                return Downtime + calc;
+            else
+                return Downtime;
+        }
+
+
         public Location()
         {
             Id = Guid.NewGuid();
-            Inventory= new(this);
+            Inventory = new(this);
+            Downtime = CalculateDownTime();
         }
-        
+
 
     }
 }

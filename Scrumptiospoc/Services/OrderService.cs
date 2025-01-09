@@ -16,7 +16,7 @@ namespace Scrumptiospoc.Services
         public OrderService()
         {
           
-            
+           
         }  
 
         public event Action? StateChanged;
@@ -56,6 +56,7 @@ namespace Scrumptiospoc.Services
             order.Status=Status.Accepted; 
             order.AcceptedDate=DateTime.Now;            
             NotifyStateChanged();
+            
         }
         public async Task RejectOrder(Order order)
         {            
@@ -66,7 +67,11 @@ namespace Scrumptiospoc.Services
         public async Task SetReadyOrder(Order order)
         {            
             order.FinishedDate = DateTime.Now;
-            order.Status = Status.Finished;            
+            order.Status = Status.Finished;  
+
+            if(order.Location.Orders.Count() <=20)
+                order.Location.IsSlow = false;
+
             NotifyStateChanged();
         }
         public async Task Delivered(Order order)
@@ -86,11 +91,17 @@ namespace Scrumptiospoc.Services
         public async Task CreateOrder(Location location)
         {
             Order order = new Order(location);
-            location.Orders.Add(order);               
+            location.Orders.Add(order);
+            if (await CountOrders(location) >= 20)
+                location.IsSlow = true;        
             NotifyStateChanged();            
         }
 
 
+        public async Task<int> CountOrders(Location location)
+        {            
+            return location.Orders.Where(o => o.Status == Status.IsSet).Count();    
+        }
     
 
         protected virtual void OnPropertyChanged(string propertyName)

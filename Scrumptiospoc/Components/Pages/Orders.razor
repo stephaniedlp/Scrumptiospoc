@@ -15,9 +15,17 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <h2>@location.Name</h2>
-            <p>@location.Address</p>
-            <button type="button" @onclick="AddOrder" class="btn btn-primary">Add Order</button>
+            <h2>@Location.Name</h2>
+            <h2>@Location.IsActive</h2>
+            <p>@Location.Address</p>
+
+            <hr />
+            <button disabled="@(!Location.IsActive)" type="button" @onclick="AddOrder" class="btn btn-primary">Add Order</button>
+            
+            <p>Location is @(Location.IsActive ? "Active" : "Inactive")</p>
+            <p>@Location.Downtime.ToString(@"hh\:mm")</p>
+
+            <p>@Location.LastOffline</p>
             <hr />
         </div>
     </div>
@@ -27,7 +35,7 @@
                 Orders
             </h2>
         </div>
-        @foreach (var item in orders)
+        @foreach (var item in Order)
         {
             <div class="col-6">
                 <div class="col-12">
@@ -87,17 +95,64 @@
 </div>
 
 @code {
-    private Location location;
-    private ObservableCollection<Order> orders = new();
+
+    private Location location = new();
+    public Location Location
+    {
+        get => location;
+        set
+        {
+            if (location != value)
+            {
+
+                location = value;
+                StateHasChanged();
+
+            }
+        }
+    }
+    private ObservableCollection<Order> _orders = new();
+    public ObservableCollection<Order> Order
+    {
+        get => _orders;
+        set
+        {
+            if (_orders != value)
+            {
+
+                _orders = value;
+                StateHasChanged();
+
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         UpdateOrders();
+        _orderservice.StateChanged += OnStateChanged;
+        _locationservice.StateChanged += OnStateChanged;
     }
+    private void OnStateChanged()
+    {
+        try
+        {
 
+            InvokeAsync(() =>
+            {
+                UpdateOrders();  // Update orders based on the new state
+                StateHasChanged();  // Trigger a re-render
+            });
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+    }
     public async void AddOrder()
     {
-        await _orderservice.CreateOrder(location);
+        await _orderservice.CreateOrder(Location);
         UpdateOrders();
 
     }
@@ -121,8 +176,9 @@
 
     public async void UpdateOrders()
     {
-        location = await _locationservice.GetSelectedLocation();
-        orders = await _orderservice.GetOrderLocation(location);
+
+        Location = await _locationservice.GetSelectedLocation();
+        Order = await _orderservice.GetOrderLocation(Location);
     }
 
 }
