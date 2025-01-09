@@ -1,5 +1,5 @@
-﻿@page "/home"
-@page "/home/{paramId:guid}"
+﻿@page "/tablet"
+@page "/tablet/{paramId:guid}"
 @layout Restaurant
 @using Scrumptiospoc.Components.Layout
 @using Scrumptiospoc.Interfaces;
@@ -12,57 +12,79 @@
 
 
 <PageTitle>Order</PageTitle>
-
-<h1>Orders</h1>
-<button class="@((Location.IsActive ? "btn btn-primary" : "btn btn-danger"))" @onclick="OnlineBtn">@ButtonText</button>
-<button class="@((Location.IsSlow ? "btn btn-warning" : "btn btn-primary"))" @onclick="SlowStatusBtn">Rush Hour: @Location.IsSlow</button>
-<br />
-<p>Total downtime is @Location.Downtime seconds </p>
-<p>@Location.LastOffline</p>
-<hr />
-
-@if (Orders.Any())
-{
-    @foreach (var item in Orders.Where(w => w.Status != Status.NotSet))
-    {
-        <div class="mt-4">
-
-            <p>@item.Id</p>
-            <p>@item.Location?.Address</p>
-            <p>@item.Status</p>
-            @foreach (var prod in item.OrderItems)
-            {
-                <ol>@prod.Product.Name</ol>
-                <ol>@prod.Product.Description</ol>
-            }
-
-
-            @if (item.Status == Status.IsSet)
-            {
-                <button class="btn btn-success" @onclick="() => Accept(item)">Accept</button>
-                <button class="btn btn-danger" @onclick="() => Reject(item)">Reject</button>
-            }
-            @if (item.Status == Status.Accepted)
-            {
-                <button class="btn btn-primary" @onclick="() => Ready(item)">Ready</button>
-                <button class="btn btn-danger" @onclick="() => Cancel(item)">Cancel</button>
-            }
-            @if (item.Status == Status.Finished)
-            {
-                <button class="btn btn-primary" @onclick="() => Delivered(item)">Delivered</button>
-                <button class="btn btn-danger" @onclick="() => Cancel(item)">Cancel</button>
-            }
-
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <h1>Orders</h1>
 
         </div>
-    }
-}
-else
-{
-    <p>No orders available.</p>
-}
+        <div class="col-4">
+        </div>
+        <div class="col-4 text-end">
+            <button class="@((Location.IsActive ? "btn btn-success" : "btn btn-danger"))" @onclick="OnlineBtn">@ButtonText</button>
+            <button class="@((Location.IsSlow ? "btn btn-warning" : "btn btn-light"))" @onclick="SlowStatusBtn">Rush Hour: @Location.IsSlow</button>
+            <p>Total downtime is @Location.Downtime seconds </p>
+        </div>
+        <div class="col-12">
+            <hr />
+        </div>
+
+        <div class="col-12">
+
+            @if (Orders.Any())
+            {
+                @foreach (var item in Orders.Where(w => w.Status != Status.NotSet))
+                {
+                    if (item.Status != Status.Delivered)
+                    {
 
 
+                        <div class="mt-4 card">
+                            <div class=" card-header text-end">
+                                <p class="small">
+                                    @item.Id
+                                </p>
+                            </div>
+                            <div class="card-body">
+
+
+                                @foreach (var prod in item.OrderItems)
+                                {
+                                    <div class=" mb-4">
+                                        <h4>@prod.Product.Name</h4>
+                                        <div>@prod.Product.Description</div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="card-footer">
+                                @if (item.Status == Status.IsSet)
+                                {
+                                    <button class="btn btn-success" @onclick="() => Accept(item)">Accept</button>
+                                    <button class="btn btn-danger" @onclick="() => Reject(item)">Reject</button>
+                                }
+                                @if (item.Status == Status.Accepted)
+                                {
+                                    <button class="btn btn-primary" @onclick="() => Ready(item)">Ready</button>
+                                    <button class="btn btn-danger" @onclick="() => Cancel(item)">Cancel</button>
+                                }
+                                @if (item.Status == Status.Finished)
+                                {
+                                    <button class="btn btn-primary" @onclick="() => Delivered(item)">Delivered</button>
+                                    <button class="btn btn-danger" @onclick="() => Cancel(item)">Cancel</button>
+                                }
+
+                            </div>
+                        </div>
+                    }
+                }
+            }
+            else
+            {
+                <p>No orders available.</p>
+            }
+        </div>
+    </div>
+</div>
 
 @code {
     [Parameter]
@@ -162,10 +184,10 @@ else
     {
         Location = _locationservice.Locations.Where(w => w.Id == paramId).SingleOrDefault();
         _locationservice.OnOffLocation(Location);
-        ButtonText = ButtonText == "Online" ? "Offline" : "Online";   
+        ButtonText = ButtonText == "Online" ? "Offline" : "Online";
         StateHasChanged();
     }
-    private void SlowStatusBtn() 
+    private void SlowStatusBtn()
     {
         _locationservice.IsSlow(Location);
         StateHasChanged();

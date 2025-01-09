@@ -18,74 +18,79 @@
             <h2>@Location.Name</h2>
             <h2>@Location.IsActive</h2>
             <p>@Location.Address</p>
-
-            <hr />
-            <button disabled="@(!Location.IsActive)" type="button" @onclick="AddOrder" class="btn btn-primary">Add Order</button>
-            
-            <p>Location is @(Location.IsActive ? "Active" : "Inactive")</p>
-            <p>@Location.Downtime.ToString(@"hh\:mm")</p>
-
-            <p>@Location.LastOffline</p>
-            <hr />
+            <p>Total downtime: @Location.Downtime</p>
+            <hr /> 
         </div>
     </div>
     <div class="row">
         <div class="col-12">
             <h2>
-                Orders
+                Orders 
             </h2>
+            <button disabled="@(!Location.IsActive)" type="button" @onclick="AddOrder" class="btn btn-primary">Add Order</button>
         </div>
         @foreach (var item in Order)
         {
-            <div class="col-6">
-                <div class="col-12">
-                    <div> @item.Id </div>
-                    <div> @item.Status </div>
-                    <div> @item.CreationDate</div>
-                    <div> @item.AcceptedDate</div>
-                    <div> @item.CacelationDate</div>
-                    <div> @item.FinishedDate</div>
-                    <div> @item.DeliveryDate</div>
-                </div>
-                <div class="col-12">
-                    @foreach (var assigned in item.Location.Inventory.Items)
-                    {
-                        <div class="row">
-                            <div class="col-4">
-                                <p>@assigned.Product.Name</p>
-                            </div>
-                            <div class="col-4">
-                                <p>@assigned.Quantity</p>
-                            </div>
-                            <div class="col-4">
-                                <button type="button" @onclick="()=>AddToOrder(assigned, item)" class="btn btn-primary">Add to Order</button>
-                            </div>
+            <div class="col-4 mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="small"> @item.Id </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-12">
+                            <h5>Activity log</h5>
+                            <div> @item.Status </div>
+                            <div> Created: @item.CreationDate</div>
+                            <div> Accepted: @item.AcceptedDate</div>
+                            <div> Cancelled: @item.CacelationDate</div>
+                            <div> Ready: @item.FinishedDate</div>
+                            <div> Delivered: @item.DeliveryDate</div>
+                            <hr />
                         </div>
-                    }
-                </div>
-                <div class="col-12">
-                    @if (item.OrderItems.Count() > 0)
-                    {
-                        <h3>Products in my Order</h3>
+                        <div class="col-12">
 
-                        @foreach (var product in item.OrderItems)
-                        {
-                            <div class="row">
-                                <div class="col-4">
-                                    <div>@product.Product.Name</div>
+                            <h5>Available products</h5>
+                            @foreach (var assigned in item.Location.Inventory.Items)
+                            {
+                                <div class="row">
+                                    <div class="col-6 p-2">
+                                        <p>@assigned.Product.Name</p>
+                                    </div>
+                                    <div class="col-2 p-2">
+                                        <p>@assigned.Quantity</p>
+                                    </div>
+                                 
+                                    <div class="col-4 text-end">
+                                        <button type="button" @onclick="()=>AddToOrder(assigned, item)" class="btn btn-primary btn-sm">Add</button>
+                                    </div>
                                 </div>
-                                <div class="col-4">
-                                    <button type="button" @onclick="()=>RemoveFromOder(product, item)" class="btn btn-primary">Remove</button>
-                                </div>
-                                <div class="col-4">
-                                </div>
-                            </div>
-                        }
+                            }
+                        </div>
+                        <div class="col-12">
+                            @if (item.OrderItems.Count() > 0)
+                            {
+                                <h5>Products in my Order</h5>
 
+                                @foreach (var product in item.OrderItems)
+                                {
+                                    <div class="row mt-2">
+                                        <div class="col-8">
+                                            <div>@product.Product.Name</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <button type="button" @onclick="()=>RemoveFromOder(product, item)" class="btn btn-danger btn-sm">Remove</button>
+                                        </div>
+                                        
+                                    </div>
+                                }
+
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer">
                         <button type="button" @onclick="()=>SetOrder(item)" class="btn btn-primary">Set Order</button>
-                    }
+                    </div>
                 </div>
-
             </div>
         }
 

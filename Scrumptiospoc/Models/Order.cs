@@ -22,6 +22,9 @@ namespace Scrumptiospoc.Models
         public Guid Id { get; set; } = Guid.NewGuid();     
         public ObservableCollection<InventoryItem> OrderItems { get; set; } = new();
         public ObservableCollection<Message> Messages { get; set; } = new(); 
+        public string UserName {  get; set; }   
+        public string DriverName { get; set; }
+        public bool IsDriverAssigned { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? AcceptedDate { get; set; }
         public DateTime? RejectedDate { get; set; }
