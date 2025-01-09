@@ -115,3 +115,7 @@ h1:focus {
             color: #fff;
             border: 0;
         }
+
+.titleProducts {
+    font-size: 1.8rem;
+}

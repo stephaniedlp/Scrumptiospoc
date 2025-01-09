@@ -34,7 +34,8 @@ namespace Scrumptiospoc.Models
         public Location Location { get; set; }
         public Guid LocationId { get; set; }
         public Status Status { get; set; }
-      
+       
+
 
     }
 
