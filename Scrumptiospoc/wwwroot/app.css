@@ -1,5 +1,22 @@
+@font-face {
+    font-family: 'Noto Sans';
+    src: url('/fonts/NotoSans-VariableFont_wdth,wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Noto Sans", serif;
+}
+
+#titlebrand {
+    font-size: 28px;
+    font-family: Georgia;
+    font-weight: 500;
+    padding: 0px;
+    color:lightgray;
 }
 
 a, .btn-link {
@@ -12,8 +29,30 @@ a, .btn-link {
     border-color: #1861ac;
 }
 
+.btn-add {
+    background-color: #BFBDBD;
+    color: #402D29;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-add:hover {
+        background-color: #402D29;
+        color: #BFBDBD;
+    }
+
+.add-subtitle {
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -49,3 +88,30 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.product-row {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 10px;
+}
+
+    .product-row input {
+        flex: 1;
+        max-width: 20rem;
+    }
+
+    .product-row .foodlogos {
+        width: 65px;
+        height: 65px;
+    }
+
+    .product-row button {
+        flex-shrink: 0;
+    }
+
+        .product-row button:hover {
+            background-color: #b32121;
+            color: #fff;
+            border: 0;
+        }

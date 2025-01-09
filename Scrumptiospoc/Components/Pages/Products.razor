@@ -1,5 +1,4 @@
-﻿<h3>Products</h3>
-@page "/products"
+﻿@page "/products"
 @rendermode InteractiveServer
 @using Scrumptiospoc.Interfaces;
 @using Scrumptiospoc.Models;
@@ -7,22 +6,31 @@
 @inject IProductInterface _productservice;
 
 <h1>Products</h1>
-<button class="btn btn-primary" @onclick="AddProduct">Add products</button>
+<p class="add-subtitle">Add Product <button class="btn-add" @onclick="AddProduct">+</button></p>
+<hr />
+
 @foreach (var item in ProductList)
 {
-    <div> <input type="text" @bind-value="@item.Name" @bind-value:event="onchange" />  </div>
-    <div> <input type="text" @bind-value="@item.Description" @bind-value:event="onchange" /> </div>
-    <div> @item.IsDeleted </div>
-    <button class="btn btn-primary" @onclick="()=>DeleteProduct(item)">Delete</button>
+    if (!item.IsDeleted)
+    {
+        <div class="product-row">
+            <img class="foodlogos" src="@($"./img/{imgCounter}.png")" />
+            <input type="text" @bind-value="@item.Name" @bind-value:event="onchange" />            
+            <input type="text" @bind-value="@item.Description" @bind-value:event="onchange" />
+            <button class="btn btn-primary " @onclick="()=>DeleteProduct(item)">Delete</button>
+        </div>
+        imgCounter++;
+        if (imgCounter > 3) imgCounter = 1;
+    }
 }
 
 @code {
 
     public ObservableCollection<Product> ProductList { get; set; }
-
-    public  void AddProduct()
+    int imgCounter = 1;
+    public void AddProduct()
     {
-         _productservice.AddProduct();
+        _productservice.AddProduct();
 
     }
 

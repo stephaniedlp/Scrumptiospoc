@@ -44,6 +44,7 @@ namespace Scrumptiospoc.Models
         public DateTime LastOnline { get; set; }
 
         public Inventory Inventory { get; set; }
+  
         public ObservableCollection<Order> Orders { get; set; } = new();
 
         public double CalculateDownTime()

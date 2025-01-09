@@ -14,24 +14,37 @@
 
 <h1>Hello Admin</h1>
 
+<p class="add-subtitle">Add Location <button class="btn-add" @onclick="AddLocation">+</button></p>
 
+<hr />
 
-<button class="btn btn-primary" @onclick="AddLocation">Add location</button>
-<th>Locations</th>
+<div class="container">
+    <div class="row">
+        @foreach (var location in LocationList)
+        {
+            <div class="col-4 mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="small">
+                            <a href="/tablet/@location.Id"> @location.Id</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-12">
 
-
-@foreach (var location in LocationList)
-{
-    <p> <a href="/tablet/@location.Id"> @location.Id</a> </p>
-    <p>@location.Name</p>
-    <p>@location.Address</p>
-    <p>
-        <button class="btn btn-primary" @onclick="()=>NavigateToInventory(location)">Inventory</button>
-        <button class="btn btn-primary" @onclick="()=>NavigateToOrders(location)">Orders</button>
-    </p>
-    
-
-}
+                            <p>Name: @location.Name</p>
+                            <p>Address: @location.Address</p>
+                        </div>
+                        <p>
+                            <button class="btn btn-primary" @onclick="()=>NavigateToInventory(location)">Inventory</button>
+                            <button class="btn btn-primary" @onclick="()=>NavigateToOrders(location)">Orders</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
 
 @code {
@@ -53,22 +66,22 @@
         }
     }
 
-   
+
     protected override async Task OnInitializedAsync()
     {
-        
+
         await base.OnInitializedAsync();
-        _orderservice.StateChanged += OnStateChanged;        
+        _orderservice.StateChanged += OnStateChanged;
         Location location = new Location
             {
                 Address = "123 Main St",
                 Longitude = 253.00,
                 Latitude = 25225.555
-            };   
+            };
         LocationList = _locationservice.Locations;
 
 
-    } 
+    }
 
 
     public async Task AddLocation()
@@ -103,6 +116,6 @@
         NavigationManager.NavigateTo("/Inventory");
     }
 
- 
+
 
 }
