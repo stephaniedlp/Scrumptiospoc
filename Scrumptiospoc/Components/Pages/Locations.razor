@@ -27,7 +27,7 @@
                     <div class="card-header">
                         <div class="small">
                             <a href="/tablet/@location.Id"> @location.Id</a>
-                            <button class="btn btn-primary" @onclick="@(() => GenerateQrCode(location.Id.ToString()))" >QR</button>
+                            <button class="btn btn-primary" @onclick="@(() => GenerateQrCode("https://scrumptious-app-a6effacngchyfna6.westus-01.azurewebsites.net/tablet/"+location.Id.ToString()))" >QR</button>
                         </div>
                     </div>
                     <div class="card-body">
