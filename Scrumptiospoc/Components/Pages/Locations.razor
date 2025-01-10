@@ -27,7 +27,7 @@
                     <div class="card-header">
                         <div class="small">
                             <a href="/tablet/@location.Id"> @location.Id</a>
-                            <button class="btn btn-primary" @onclick="@(() => GenerateQrCode("https://scrumptious-app-a6effacngchyfna6.westus-01.azurewebsites.net/tablet/"+location.Id.ToString()))" >QR</button>
+                            <button class="btn btn-primary" @onclick="@(() => GenerateQrCode("https://scrumptious-app-a6effacngchyfna6.westus-01.azurewebsites.net/tablet/"+location.Id.ToString()))">QR</button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -47,12 +47,29 @@
     </div>
 </div>
 
-
-<div id="qrCodeContainer">
-    @if (QrCodeBase64 != null)
-    {
-        <img src="data:image/png;base64,@QrCodeBase64" alt="QR Code" />
-    }
+<div class="modal @((ShowModal ? "show d-block" : "d-none"))" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">QR Code</h3>
+            </div>
+            <div class="modal-body qr-img">
+                @if (!string.IsNullOrEmpty(QrCodeBase64))
+                {
+                    
+                    <img src="data:image/png;base64,@QrCodeBase64" alt="QR Code" />
+               
+                }
+                else
+                {
+                    <p>Generating QR code...</p>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -75,8 +92,17 @@
             }
         }
     }
+    private bool ShowModal { get; set; } = false;
+    public async Task OpenModal()
+    {
+        ShowModal = true;
+        StateHasChanged();
+    }
+    public void CloseModal()
+    {
+        ShowModal = false;
 
-
+    }
     protected override async Task OnInitializedAsync()
     {
 
@@ -100,6 +126,9 @@
         using var qrCode = new QRCoder.PngByteQRCode(qrData);
         var qrCodeBytes = qrCode.GetGraphic(20);
         QrCodeBase64 = Convert.ToBase64String(qrCodeBytes);
+
+        ShowModal = true;
+        StateHasChanged();
     }
 
     private async Task PrintQrCode()
