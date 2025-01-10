@@ -102,8 +102,8 @@ h1:focus {
     }
 
     .product-row .foodlogos {
-        width: 65px;
-        height: 65px;
+        max-width: 65px;
+        max-height: 65px;
     }
 
     .product-row button {
@@ -118,4 +118,10 @@ h1:focus {
 
 .titleProducts {
     font-size: 1.8rem;
+}
+
+
+.card-body p {
+    font-weight: 500;
+    font-size: 20px;
 }

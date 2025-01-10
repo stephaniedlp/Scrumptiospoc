@@ -12,6 +12,7 @@ builder.Services.AddSingleton<IOrderInterface, OrderService>();
 builder.Services.AddSingleton<ILocationInterface, LocationService>();
 builder.Services.AddSingleton<IProductInterface, ProductService>();
 builder.Services.AddSingleton<IInventoryInterface, InventoryService>();
+builder.Services.AddSingleton<IPlatformInterface, PlatformService>();
 
 var app = builder.Build();
 

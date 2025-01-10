@@ -33,6 +33,8 @@ namespace Scrumptiospoc.Models
         public DateTime? DeliveryDate { get; set; }
         public Location Location { get; set; }
         public Guid LocationId { get; set; }
+        public Platform Platform { get; set; }
+        public Guid PlatformId { get; set; }
         public Status Status { get; set; }
        
 

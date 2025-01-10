@@ -1,0 +1,94 @@
+﻿@page "/platforms"
+@using Scrumptiospoc.Interfaces
+@using System.Collections.ObjectModel
+@using System.ComponentModel
+@using Scrumptiospoc.Models
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager;
+@inject IPlatformInterface _platformservice;
+
+<PageTitle>Platforms</PageTitle>
+<h3>Platform</h3>
+
+<p class="add-subtitle">Add a platform <button class="btn-add" @onclick="AddPlatform">+</button></p>
+<hr />
+
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in PlatformList)
+        {
+            <div class="col-4 mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="small">
+                            <p> @item.Id</p>
+                            
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-12">
+
+                            <p>Name: @item.Name </p>
+                            <p>Date Created: @item.CreatedAt </p>
+                            <input type="text" @bind-value="@item.UrlToken" @bind-value:event="onchange" />
+                          <p> Active: @item.IsActive </p>
+
+
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@code {   
+    
+    private ObservableCollection<Platform> _platform = new();
+    public ObservableCollection<Platform> PlatformList
+    {
+        get => _platform;
+        set
+        {
+            if (_platform != value)
+            {
+
+                _platform = value;
+                OnPropertyChanged(nameof(PlatformList));
+                OnStateChanged();
+
+            }
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        _platformservice.StateChanged += OnStateChanged;
+        Platform platform = new Platform{
+                Name = "Test",
+                IsActive = true,
+                CreatedAt = DateTime.Now
+        };
+        PlatformList = _platformservice.PlatformList;
+
+
+    }
+    private void OnStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+    public async Task AddPlatform()
+    {
+        await _platformservice.CreatePlatform();
+        StateHasChanged();
+    }
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
