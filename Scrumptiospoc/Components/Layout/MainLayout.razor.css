@@ -9,7 +9,9 @@ main {
 }
 
 .sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #402D29 70%);
+    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, rgb(129, 138, 154) 80%);
+    border-radius: 20px;
+       height: 100vh;
 }
 
 .top-row {
@@ -94,3 +96,8 @@ main {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+
+#containerTitleBrand {
+    border-radius: 10px;
+}
