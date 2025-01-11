@@ -7,83 +7,101 @@
 @using System.Collections.ObjectModel
 @inject IOrderInterface _orderservice;
 @inject ILocationInterface _locationservice;
+@inject IInventoryInterface _inventoryservice;
 @rendermode InteractiveServer
 
 
 
 <PageTitle>Order</PageTitle>
 <div class="container">
-    <div class="row">
-        <div class="col-4">
-            <h1>Orders</h1>
+    <!--#region HEADER  -->
+        <div class="row">
+            <div class=" col-4">
+                <h1>Orders</h1>
 
-        </div>
-        <div class="col-4">
-        </div>
-        <div class="col-4 text-end">
-            <button class="@((Location.IsActive ? "btn btn-success" : "btn btn-danger"))" @onclick="OnlineBtn">@ButtonText</button>
-            <button class="@((Location.IsSlow ? "btn btn-warning" : "btn btn-light"))" @onclick="SlowStatusBtn">Rush Hour: @Location.IsSlow</button>
-            <p>Total downtime is @Location.Downtime seconds </p>
-        </div>
-        <div class="col-12">
-            <hr />
-        </div>
+            </div>
+            <div class="col-4">
+            </div>
+            <div class="col-4 text-end">
+                <button class="@((Location.IsActive ? "btn btn-success" : "btn btn-danger"))" @onclick="OnlineBtn">@ButtonText</button>
+                <button class="@((Location.IsSlow ? "btn btn-warning" : "btn btn-light"))" @onclick="SlowStatusBtn">Rush Hour: @Location.IsSlow</button>
+                <p>Total downtime is @Location.Downtime seconds </p>
+            </div>
+        </div>        <hr />    
+    <!--#endregion HEADER  -->
 
-        <div class="col-12">
-
-            @if (Orders.Any())
-            {
-                @foreach (var item in Orders.Where(w => w.Status != Status.NotSet))
-                {
-                    if (item.Status != Status.Delivered)
-                    {
-
-
-                        <div class="mt-4 card">
-                            <div class=" card-header text-end">
-                                <p class="small">
-                                    @item.Id
-                                </p>
-                            </div>
-                            <div class="card-body">
-
-
-                                @foreach (var prod in item.OrderItems)
-                                {
-                                    <div class=" mb-4">
-                                        <h4>@prod.Product.Name</h4>
-                                        <div>@prod.Product.Description</div>
-                                    </div>
-                                }
-                            </div>
-                            <div class="card-footer">
-                                @if (item.Status == Status.IsSet)
-                                {
-                                    <button class="btn btn-success" @onclick="() => Accept(item)">Accept</button>
-                                    <button class="btn btn-danger" @onclick="() => Reject(item)">Reject</button>
-                                }
-                                @if (item.Status == Status.Accepted)
-                                {
-                                    <button class="btn btn-primary" @onclick="() => Ready(item)">Ready</button>
-                                    <button class="btn btn-danger" @onclick="() => Cancel(item)">Cancel</button>
-                                }
-                                @if (item.Status == Status.Finished)
-                                {
-                                    <button class="btn btn-primary" @onclick="() => Delivered(item)">Delivered</button>
-                                    <button class="btn btn-danger" @onclick="() => Cancel(item)">Cancel</button>
-                                }
-
-                            </div>
-                        </div>
-                    }
-                }
-            }
-            else
-            {
-                <p>No orders available.</p>
-            }
-        </div>
+    @* Region inventorycontainer firstrow *@
+    <div class="row col-4 card">
+        <h4>Products available</h4>
+        @foreach (var item in Location.Inventory.Items)
+        {
+            <div class="row">
+                <div class="col-6 p-2">
+                    <p>@item.Product.Name</p>
+                </div>
+                <div class="col-2 p-2">
+                    <p>@item.Quantity</p>
+                </div>
+                <div class="col-4 text-end">
+                    <button type="button" @onclick="()=>DisableBtn(item)" class="btn btn-primary btn-sm">Disable</button>
+                </div>
+            </div>
+        }
     </div>
+    <hr />
+    @* fin inventory container *@
+
+
+    @if (Orders.Any())
+    {
+        @foreach (var item in Orders.Where(w => w.Status != Status.NotSet))
+        {
+
+            if (item.Status != Status.Delivered)
+            {
+                <div class="mt-4 card">
+                    <div class=" card-header text-end">
+                        <p class="small">
+                            @item.Id
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var prod in item.OrderItems)
+                        {
+                            <div class=" mb-4">
+                                <h4>@prod.Product.Name</h4>
+                                <div>@prod.Product.Description</div>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        @if (item.Status == Status.IsSet)
+                        {
+                            <button class="btn btn-success" @onclick="() => Accept(item)">Accept</button>
+                            <button class="btn btn-danger" @onclick="() => Reject(item)">Reject</button>
+                        }
+                        @if (item.Status == Status.Accepted)
+                        {
+                            <button class="btn btn-primary" @onclick="() => Ready(item)">Ready</button>
+                            <button class="btn btn-danger" @onclick="() => Cancel(item)">Cancel</button>
+                        }
+                        @if (item.Status == Status.Finished)
+                        {
+                            <button class="btn btn-primary" @onclick="() => Delivered(item)">Delivered</button>
+                            <button class="btn btn-danger" @onclick="() => Cancel(item)">Cancel</button>
+                        }
+
+                    </div>
+                </div>
+            }
+        }
+
+
+    }
+    else
+    {
+        <p>No orders available.</p>
+    }
 </div>
 
 @code {
@@ -126,7 +144,7 @@
         // Call the base method asynchronously
         await base.OnInitializedAsync();
         _orderservice.StateChanged += OnStateChanged;
-
+        _inventoryservice.StateChanged += OnStateChanged;
         if (paramId != Guid.Empty)
         {
             RefreshOrders(paramId);
@@ -215,5 +233,9 @@
         }
 
     }
-
+    private void DisableBtn(InventoryItem inventoryItem)
+    {
+        _inventoryservice.IsDisabled(inventoryItem);
+        StateChanged?.Invoke();
+    }
 }

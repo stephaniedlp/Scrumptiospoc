@@ -34,8 +34,14 @@ namespace Scrumptiospoc.Services
 
         public async Task AddProductToOrder(InventoryItem prod, Order order)
         {
-            order.OrderItems.Add(prod);
-            NotifyStateChanged();
+            if (prod.Quantity >= 1)
+            {
+                order.OrderItems.Add(prod);
+                prod.Quantity -= 1;
+                NotifyStateChanged();
+            }
+            
+           
         }
 
         public async Task RemoveProductFromOrder(InventoryItem item, Order order)
@@ -82,7 +88,7 @@ namespace Scrumptiospoc.Services
         }
         public async Task CancelOrder(Order order)
         {            
-            order.CacelationDate = DateTime.Now;
+            order.CancelationDate = DateTime.Now;
             order.Status=Status.Canceled;            
             NotifyStateChanged();
         }

@@ -1,4 +1,6 @@
-﻿namespace Scrumptiospoc.Models
+﻿using System.Collections.ObjectModel;
+
+namespace Scrumptiospoc.Models
 {
     public class Inventory : BaseModel
     {
@@ -26,7 +28,20 @@
                 }
             }
         }
-        public List<InventoryItem> Items { get; set; } = new();
+        private ObservableCollection<InventoryItem> _items = new();
+        public ObservableCollection<InventoryItem> Items
+        {
+            get => _items;
+            set
+            {
+                if (_items != value)
+                {
+                    _items = value;
+                    OnPropertyChanged(nameof(Items));
+                }
+            }
+        }
+
      
    
        

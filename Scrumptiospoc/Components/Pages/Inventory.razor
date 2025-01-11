@@ -30,10 +30,9 @@
 {
     foreach (var item in inventory.Items)
     {
-        <div>@item.Product.Name</div>
         <div>
-            <input type="text" @bind-value="@item.Quantity" @bind-value:event="onchange" />
-
+            @item.Product.Name
+            <input type="number" @bind-value="@item.Quantity" @bind-value:event="onchange" />
         </div>
     }
 }
@@ -48,16 +47,16 @@
                 <h5 class="modal-title titleProducts">Select Products</h5>
                 <button type="button" class="btn-close" aria-label="Close" @onclick="CloseProductModal"></button>
             </div>
-          
-                @foreach (var item in ProductList)
-                {
-                    <div class="modal-body mb-0 pb-0">
-                        <input type="checkbox" @bind="@item.IsSelected" /> @item.Name
-                    </div>
-                }
-          
 
-          
+            @foreach (var item in ProductList)
+            {
+                <div class="modal-body mb-0 pb-0">
+                    <input type="checkbox" @bind="@item.IsSelected" /> @item.Name
+                </div>
+            }
+
+
+
             <div class="modal-footer">
                 <button type="button" @onclick="AssignProducts" class="btn btn-primary">Assign Products</button>
             </div>

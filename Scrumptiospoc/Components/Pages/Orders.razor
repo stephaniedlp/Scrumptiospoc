@@ -19,6 +19,7 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
+            <a href="/tablet/@Location.Id"> @Location.Id</a>
             <h1>@Location.Name</h1>
             <h2>@Location.IsActive</h2>
             <p>@Location.Address</p>
@@ -45,67 +46,70 @@
                     <div class="card-body">
                         <div class="col-12">
                             <p>Activity log</p>
-                            <div > Created @item.CreationDate</div>
+                            <div> Created @item.CreationDate</div>
 
                             <div class="mb-1">  Accepted  @item.AcceptedDate</div>
-                            <div class="mb-1"> Cancelled  @item.CacelationDate</div>
-                            
-                            <div>  Ready @item.FinishedDate</div>
-                            <div>  Delivered @item.DeliveryDate</div>
-                            <hr />
-                        </div>
-                        <div class="col-12">
+                            <div class="mb-1">
+                                Cancelled  @item.CancelationDate
+                                <div>  Ready @item.FinishedDate</div>
+                                <div>  Delivered @item.DeliveryDate</div>
+                                <hr />
+                            </div>
+                            <div class="col-12">
 
-                            <p>Products available</p>
-                            @foreach (var assigned in item.Location.Inventory.Items)
-                            {
-                                <div class="row">
-                                    <div class="col-6 p-2">
-                                        <p>@assigned.Product.Name</p>
-                                    </div>
-                                    <div class="col-2 p-2">
-                                        <p>@assigned.Quantity</p>
-                                    </div>
-
-                                    <div class="col-4 text-end">
-                                        <button type="button" @onclick="()=>AddToOrder(assigned, item)" class="btn btn-primary btn-sm">Add</button>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                        <div class="col-12">
-                            @if (item.OrderItems.Count() > 0)
-                            {
-                                <h5>Products in my Order</h5>
-
-                                @foreach (var product in item.OrderItems)
+                                <p>Products available</p>
+                                @foreach (var assigned in item.Location.Inventory.Items)
                                 {
-                                    <div class="row mt-2">
-                                        <div class="col-8">
-                                            <div>@product.Product.Name</div>
+                                    <div class="row">
+                                        <div class="col-6 p-2">
+                                            <p>@assigned.Product.Name</p>
                                         </div>
-                                        <div class="col-4">
-                                            <button type="button" @onclick="()=>RemoveFromOder(product, item)" class="btn btn-danger btn-sm">Remove</button>
+                                        <div class="col-2 p-2">
+
+                                            <p>@assigned.Quantity</p>
                                         </div>
 
+                                        <div class="col-4 text-end ">
+
+                                            <button type="button" disabled="@(!assigned.IsDisabled && assigned.Quantity == 0)" @onclick="()=>AddToOrder(assigned, item)" class="btn btn-primary btn-sm">
+                                                Add
+
+                                            </button>
+
+                                        </div>
                                     </div>
                                 }
+                            </div>
+                            <div class="col-12">
+                                @if (item.OrderItems.Count() > 0)
+                                {
+                                    <h5>Products in my Order</h5>
 
-                            }
+                                    @foreach (var product in item.OrderItems)
+                                    {
+                                        <div class="row mt-2">
+                                            <div class="col-8">
+                                                <div>@product.Product.Name</div>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="button" @onclick="()=>RemoveFromOder(product, item)" class="btn btn-danger btn-sm">Remove</button>
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                }
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-footer">
-                        <button type="button" @onclick="()=>SetOrder(item)" class="btn btn-primary">Set Order</button>
+                        <div class="card-footer">
+                            <button type="button" @onclick="()=>SetOrder(item)" class="btn btn-primary">Set Order</button>
+                        </div>
                     </div>
                 </div>
             </div>
         }
-
-
-
     </div>
 </div>
-
 @code {
 
     private Location location = new();
@@ -167,6 +171,7 @@
         await _orderservice.CreateOrder(Location);
         UpdateOrders();
 
+
     }
 
 
@@ -183,14 +188,17 @@
 
     public async void AddToOrder(InventoryItem item, Order order)
     {
-        await _orderservice.AddProductToOrder(item, order);
+        if (!item.IsDisabled)
+        {
+            await _orderservice.AddProductToOrder(item, order);
+            StateHasChanged();
+        }
+
     }
 
     public async void UpdateOrders()
     {
-
         Location = await _locationservice.GetSelectedLocation();
         Order = await _orderservice.GetOrderLocation(Location);
     }
-
 }

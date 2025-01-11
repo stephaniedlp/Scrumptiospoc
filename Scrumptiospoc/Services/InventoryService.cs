@@ -10,7 +10,7 @@ namespace Scrumptiospoc.Services
     {
         public Models.Inventory selectedInventory;
 
-
+       
         public async Task SetSelectedInventory(Models.Inventory inv)
         {
             selectedInventory = inv;
@@ -26,8 +26,14 @@ namespace Scrumptiospoc.Services
             bool isthere = selectedInventory.Items.Any(w => w.Product.Id == product.Id);
             return isthere;
         }
+     
 
+        public async Task IsDisabled(InventoryItem inventoryitem)
+        {
+            inventoryitem.IsDisabled = !inventoryitem.IsDisabled;
+            StateChanged?.Invoke();
 
+        }
         public async Task<bool> AssignProduct(Product product)
         {
             InventoryItem inv = new(selectedInventory, product);
@@ -43,7 +49,11 @@ namespace Scrumptiospoc.Services
             }
         }
 
-
+        public event Action? StateChanged;
+        private void NotifyStateChanged()
+        {
+            StateChanged?.Invoke();
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)

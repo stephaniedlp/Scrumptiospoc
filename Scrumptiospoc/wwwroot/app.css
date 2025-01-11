@@ -136,3 +136,7 @@ h1:focus {
     max-height: 500px;
     margin: 0 auto;
 }
+
+.headerorders {
+    justify-content:space-around;
+}
