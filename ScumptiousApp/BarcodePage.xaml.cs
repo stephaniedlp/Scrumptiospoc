@@ -21,6 +21,24 @@ public partial class BarcodePage : ContentPage
 
     protected void BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
     {
+        // Dictionary mapping barcode numbers to names
+        var barcodeNames = new Dictionary<string, string>
+    {
+        { "00850070270021", "Classic Breakfast Burrito" },
+        { "00850070270014", "Veggie Breakfast Burrito" },
+        { "00850070270106", "The Summer Bod Quesadilla" },
+        { "00850070270052", "Say Cheese Quesadilla" },
+        { "00850070270038", "Chicken And Cheese Quesadilla Chicken Bacon Pesto Quesadilla" },
+        { "00850070270069", "Chicken and Cheese Quesadilla Chicken Bacon Quesadilla" },
+        { "00850070270090", "Chicken and Cheese Quesadilla Hunky Texan Quesadilla" },
+        { "00850070270076", "Chicken and Cheese Quesadilla Pollo Loco Quesadilla" },
+        { "00850070270083", "Beef Quesadilla The Reezo Quesadilla" },
+        { "00860006511980", "Chorizo Breakfast Burrito With Egg and Cheese" },
+        { "00860006511883", "Pork Sausage Breakfast Burrito With Egg and Cheese" },
+        { "00860006511876", "Bacon Breakfast Burrito With Egg and Cheese" }
+
+    };
+
         foreach (var barcode in e.Results)
             Console.WriteLine($"Barcodes: {barcode.Format} -> {barcode.Value}");
 
@@ -29,31 +47,43 @@ public partial class BarcodePage : ContentPage
         {
             Dispatcher.Dispatch(async () =>
             {
-                // Verificar si el valor es un link válido
-                if (Uri.TryCreate(first.Value, UriKind.Absolute, out var uri))
+                // Check if the barcode matches a predefined name
+                if (barcodeNames.TryGetValue(first.Value, out var name))
                 {
-                    // Navegar a la página del WebView con la URL
+                    // Display the item name in the label
+                    ResultLabel.Text = $"Item: {name}";
+                }
+                else if (Uri.TryCreate(first.Value, UriKind.Absolute, out var uri))
+                {
+                    // Navigate to the WebViewPage with the URL
                     await Navigation.PushAsync(new WebViewPage(uri.AbsoluteUri));
 
-                    // Detener la detección para evitar escaneos duplicados
+                    // Stop detection to prevent duplicate scans
                     barcodeView.IsDetecting = false;
+                }
+                else if (long.TryParse(first.Value, out long barcodeNumber))
+                {
+                    // If the barcode value is numeric, display it
+                    ResultLabel.Text = $"Barcode (Numeric): {barcodeNumber}";
                 }
                 else
                 {
-                    // Actualiza el generador y la etiqueta como antes
+                    // Update the BarcodeGeneratorView and Label as usual for non-numeric barcodes
                     barcodeGenerator.ClearValue(BarcodeGeneratorView.ValueProperty);
                     barcodeGenerator.Format = first.Format;
                     barcodeGenerator.Value = first.Value;
 
-                    // Actualiza el texto en el label
+                    // Update the label text
                     ResultLabel.Text = $"Barcodes: {first.Format} -> {first.Value}";
 
-                    // Genera y guarda la imagen del código
+                    // Generate and save the barcode image
                     await GenerateAndSaveBarcodeImageAsync(barcodeGenerator, "barcode.png");
                 }
             });
         }
     }
+
+
 
     void SwitchCameraButton_Clicked(object sender, EventArgs e)
     {
