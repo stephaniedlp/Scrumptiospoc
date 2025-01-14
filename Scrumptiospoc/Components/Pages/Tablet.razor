@@ -56,7 +56,6 @@
     {
         @foreach (var item in Orders.Where(w => w.Status != Status.NotSet))
         {
-
             if (item.Status != Status.Delivered)
             {
                 <div class="mt-4 card">
@@ -182,6 +181,8 @@
     {
         _orderservice.RejectOrder(order);
         StateHasChanged();
+        NotifyStateChanged();
+        OnStateChanged();
     }
     private void Ready(Order order)
     {

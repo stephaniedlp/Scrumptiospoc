@@ -22,7 +22,7 @@
     <h1>Inventory</h1>
     <h2>@inventory.Location.Name</h2>
     <p>@inventory.Location.Address</p>
-    <button type="button" class="btn btn-primary " @onclick="OpenProductModal">Assign Products</button>
+    <button type="button" class="btn btn-primary " @onclick="OpenProductModal">Products to assign</button>
 </div>
 <hr />
 
@@ -40,8 +40,8 @@
 
 
 <!-- Modal -->
-<div class="modal fade @((ShowModal ? "show d-block" : "d-none"))" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal pt fade @((ShowModal ? "show d-block" : "d-none"))" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title titleProducts">Select Products</h5>
@@ -50,7 +50,7 @@
 
             @foreach (var item in ProductList)
             {
-                <div class="modal-body mb-0 pb-0">
+                <div class="modal-body pb-0">
                     <input type="checkbox" @bind="@item.IsSelected" /> @item.Name
                 </div>
             }

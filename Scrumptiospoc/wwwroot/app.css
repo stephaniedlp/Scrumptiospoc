@@ -5,8 +5,6 @@
     font-style: normal;
 }
 
-
-
 html, body {
     font-family: "Noto Sans", serif;
 }
@@ -117,7 +115,7 @@ h1:focus {
         }
 
 .titleProducts {
-    font-size: 1.8rem;
+    font-size: 2rem;
 }
 
 

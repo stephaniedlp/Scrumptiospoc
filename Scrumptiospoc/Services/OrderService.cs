@@ -70,6 +70,12 @@ namespace Scrumptiospoc.Services
             order.Status=Status.Rejected;            
             NotifyStateChanged();
         }
+        public async Task CancelOrder(Order order)
+        {
+            order.CancelationDate = DateTime.Now;
+            order.Status = Status.Canceled;
+            NotifyStateChanged();
+        }
         public async Task SetReadyOrder(Order order)
         {            
             order.FinishedDate = DateTime.Now;
@@ -86,12 +92,7 @@ namespace Scrumptiospoc.Services
             order.Status=Status.Delivered;            
             NotifyStateChanged();
         }
-        public async Task CancelOrder(Order order)
-        {            
-            order.CancelationDate = DateTime.Now;
-            order.Status=Status.Canceled;            
-            NotifyStateChanged();
-        }
+       
 
 
         public async Task CreateOrder(Location location)
