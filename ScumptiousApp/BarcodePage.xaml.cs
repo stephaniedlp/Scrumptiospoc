@@ -59,9 +59,8 @@ public partial class BarcodePage : ContentPage
 
                     // Construir la URL con los parámetros
                     string baseUrl = "https://scrumptious-app-a6effacngchyfna6.westus-01.azurewebsites.net/Inventory";
-                    string query = $"?barcode={Uri.EscapeDataString(first.Value)}" +
-                                   $"&guid={Uri.EscapeDataString(extractedGuid)}";
-                    string fullUrl = baseUrl + query;
+                    string fullUrl = $"{baseUrl}/{Uri.EscapeDataString(extractedGuid)}/{Uri.EscapeDataString(first.Value)}";
+
 
                     await Navigation.PushAsync(new WebViewPage(fullUrl));
 
