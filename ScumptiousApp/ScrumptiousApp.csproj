@@ -56,6 +56,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\qr_icon.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <AndroidResource Include="Platforms\Android\Resources\mipmap-hdpi\appicon.png" />
 	  <AndroidResource Include="Platforms\Android\Resources\mipmap-mdpi\appicon.png" />
 	  <AndroidResource Include="Platforms\Android\Resources\mipmap-xhdpi\appicon.png" />

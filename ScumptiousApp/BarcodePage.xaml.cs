@@ -21,23 +21,22 @@ public partial class BarcodePage : ContentPage
 
     protected void BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
     {
-        // Dictionary mapping barcode numbers to names
+        // Diccionario con los nombres de productos y códigos de barras
         var barcodeNames = new Dictionary<string, string>
-    {
-        { "00850070270021", "Classic Breakfast Burrito" },
-        { "00850070270014", "Veggie Breakfast Burrito" },
-        { "00850070270106", "The Summer Bod Quesadilla" },
-        { "00850070270052", "Say Cheese Quesadilla" },
-        { "00850070270038", "Chicken And Cheese Quesadilla Chicken Bacon Pesto Quesadilla" },
-        { "00850070270069", "Chicken and Cheese Quesadilla Chicken Bacon Quesadilla" },
-        { "00850070270090", "Chicken and Cheese Quesadilla Hunky Texan Quesadilla" },
-        { "00850070270076", "Chicken and Cheese Quesadilla Pollo Loco Quesadilla" },
-        { "00850070270083", "Beef Quesadilla The Reezo Quesadilla" },
-        { "00860006511980", "Chorizo Breakfast Burrito With Egg and Cheese" },
-        { "00860006511883", "Pork Sausage Breakfast Burrito With Egg and Cheese" },
-        { "00860006511876", "Bacon Breakfast Burrito With Egg and Cheese" }
-
-    };
+        {
+            { "00850070270021", "Classic Breakfast Burrito" },
+            { "00850070270014", "Veggie Breakfast Burrito" },
+            { "00850070270106", "The Summer Bod Quesadilla" },
+            { "00850070270052", "Say Cheese Quesadilla" },
+            { "00850070270038", "Chicken And Cheese Quesadilla Chicken Bacon Pesto Quesadilla" },
+            { "00850070270069", "Chicken and Cheese Quesadilla Chicken Bacon Quesadilla" },
+            { "00850070270090", "Chicken and Cheese Quesadilla Hunky Texan Quesadilla" },
+            { "00850070270076", "Chicken and Cheese Quesadilla Pollo Loco Quesadilla" },
+            { "00850070270083", "Beef Quesadilla The Reezo Quesadilla" },
+            { "00860006511980", "Chorizo Breakfast Burrito With Egg and Cheese" },
+            { "00860006511883", "Pork Sausage Breakfast Burrito With Egg and Cheese" },
+            { "00860006511876", "Bacon Breakfast Burrito With Egg and Cheese" }
+        };
 
         foreach (var barcode in e.Results)
             Console.WriteLine($"Barcodes: {barcode.Format} -> {barcode.Value}");
@@ -47,43 +46,75 @@ public partial class BarcodePage : ContentPage
         {
             Dispatcher.Dispatch(async () =>
             {
-                // Check if the barcode matches a predefined name
-                if (barcodeNames.TryGetValue(first.Value, out var name))
+                // Extraer GUID desde la URL almacenada en preferencias
+                string storedUrl = Preferences.Get("LastOpenedUrl", string.Empty);
+                string extractedGuid = ExtractLastGuidFromUrl(storedUrl);
+
+                // Verificar si el código de barras coincide con un producto
+                if (barcodeNames.TryGetValue(first.Value, out var productName))
                 {
-                    // Display the item name in the label
-                    ResultLabel.Text = $"Item: {name}";
+                    // Mostrar el nombre del producto en el label
+                    ResultLabel.Text = $"Item: {productName}";
+                    await Task.Delay(1000);
+
+                    // Construir la URL con los parámetros
+                    string baseUrl = "https://scrumptious-app-a6effacngchyfna6.westus-01.azurewebsites.net/Inventory";
+                    string query = $"?barcode={Uri.EscapeDataString(first.Value)}" +
+                                   $"&guid={Uri.EscapeDataString(extractedGuid)}";
+                    string fullUrl = baseUrl + query;
+
+                    await Navigation.PushAsync(new WebViewPage(fullUrl));
+
+                  
                 }
                 else if (Uri.TryCreate(first.Value, UriKind.Absolute, out var uri))
                 {
-                    // Navigate to the WebViewPage with the URL
+                    Preferences.Set("LastOpenedUrl", uri.AbsoluteUri);
+                    // Navegar a la página WebView con la URL
                     await Navigation.PushAsync(new WebViewPage(uri.AbsoluteUri));
 
-                    // Stop detection to prevent duplicate scans
+                    // Detener la detección para evitar escaneos duplicados
                     barcodeView.IsDetecting = false;
                 }
                 else if (long.TryParse(first.Value, out long barcodeNumber))
                 {
-                    // If the barcode value is numeric, display it
+                    // Si el código de barras es numérico, mostrarlo
                     ResultLabel.Text = $"Barcode (Numeric): {barcodeNumber}";
                 }
                 else
                 {
-                    // Update the BarcodeGeneratorView and Label as usual for non-numeric barcodes
+                    // Actualizar la vista del generador de códigos de barras
                     barcodeGenerator.ClearValue(BarcodeGeneratorView.ValueProperty);
                     barcodeGenerator.Format = first.Format;
                     barcodeGenerator.Value = first.Value;
 
-                    // Update the label text
+                    // Actualizar el texto en el label
                     ResultLabel.Text = $"Barcodes: {first.Format} -> {first.Value}";
 
-                    // Generate and save the barcode image
+                    // Generar y guardar la imagen del código de barras
                     await GenerateAndSaveBarcodeImageAsync(barcodeGenerator, "barcode.png");
                 }
             });
         }
     }
 
+    private string ExtractLastGuidFromUrl(string url)
+    {
+        if (!string.IsNullOrEmpty(url))
+        {
+            // Analizar la URL y extraer el último segmento
+            var uri = new Uri(url);
+            var lastSegment = uri.Segments.LastOrDefault()?.Trim('/');
 
+            // Validar si el último segmento es un GUID
+            if (Guid.TryParse(lastSegment, out Guid guid))
+            {
+                return guid.ToString();
+            }
+        }
+
+        return null; // Retorna null si no es un GUID válido
+    }
 
     void SwitchCameraButton_Clicked(object sender, EventArgs e)
     {
